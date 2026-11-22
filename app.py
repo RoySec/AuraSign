@@ -359,7 +359,7 @@ class BidirectionalAvatar:
         self.current_vec = self.rest_vec.copy()
         self.target_vec = self.rest_vec.copy()
         self.last_switch = time.time()
-        self.frame_duration = 0.26
+        self.frame_duration = 0.45  # Deliberate, clear signing pace
         self.status_text = "Press [V] to Speak, [T] to Type, [A] Avatar"
 
     def _load_custom_avatar_image(self):
@@ -402,13 +402,13 @@ class BidirectionalAvatar:
             diff = np.linalg.norm(bgr - bg_sample, axis=2, keepdims=True)
             alpha = np.clip((diff - 16.0) / 24.0, 0.0, 1.0)
 
-        # Mask out the static hanging arms outside the torso below the shoulder line (y >= 134)
+        # Mask out the static hanging arms outside the torso below the shoulder line (y >= 136)
         yy, xx = np.mgrid[0:target_h, 0:target_w]
         cx_local = target_w * 0.5
         shoulder_y_local = 136.0
         below_shoulders = yy > shoulder_y_local
         progress = np.clip((yy - shoulder_y_local) / (target_h - shoulder_y_local), 0.0, 1.0)
-        allowed_half_w = 66.0 - progress * 12.0  # Smooth torso taper from shoulder to waist
+        allowed_half_w = 66.0 - progress * 12.0
         dist_from_center = np.abs(xx - cx_local)
 
         arm_mask = np.where(
@@ -500,35 +500,29 @@ class BidirectionalAvatar:
         left_active = max(abs(v) for v in base_vec[:63]) > 1e-4 and (base_vec[174 + 28] < 0.80)
         right_active = max(abs(v) for v in base_vec[87:150]) > 1e-4 and (base_vec[174 + 31] < 0.80)
 
-        phase = step_idx / max(1, total_steps - 1)  # 0.0 -> 1.0
+        phase = step_idx / max(1, total_steps - 1)
         dx, dy, wrist_rot = 0.0, 0.0, 0.0
 
         if step_idx == 0:
-            # Preparation lift from lower chest
             dy = 0.24
             wrist_rot = -0.15
         elif 'hello' in word_key:
-            # Side-to-side friendly wave
             wave = math.sin(phase * math.pi * 2.5)
             dx = wave * 0.16
             wrist_rot = wave * 0.32
         elif 'yes' in word_key:
-            # Up-and-down affirmative nod motion
             nod = math.sin(phase * math.pi * 2.5)
             dy = nod * 0.14
             wrist_rot = nod * 0.22
         elif 'no' in word_key:
-            # Side-to-side shake
             shake = math.sin(phase * math.pi * 3.0)
             dx = shake * 0.15
             wrist_rot = shake * 0.25
         elif 'thank' in word_key or 'please' in word_key:
-            # Outward & downward courteous arc
             dx = phase * 0.12
             dy = phase * 0.18
             wrist_rot = phase * 0.24
         else:
-            # Expressive emphasis pulse for any custom sign
             pulse = math.sin(phase * math.pi * 2.0)
             dx = pulse * 0.09
             dy = -abs(pulse) * 0.10
@@ -549,7 +543,6 @@ class BidirectionalAvatar:
     def _enqueue_word_motion(self, display_label, pose_entry):
         arr = np.array(pose_entry, dtype=float)
         raw_frames = [arr] if arr.ndim == 1 else list(arr)
-        # Expand to 5 smooth animation keyframes with kinematic motion
         expanded = []
         for idx in range(5):
             src_frame = raw_frames[min(len(raw_frames) - 1, int(idx * len(raw_frames) / 5))]
@@ -622,7 +615,6 @@ class BidirectionalAvatar:
                     alpha = self.custom_alpha[:crop_h]
                     panel[y1:y2, x1:x2] = (fg * alpha + roi * (1.0 - alpha)).astype(np.uint8)
 
-                # Exact shoulder coordinates aligned to the cropped portrait's hoodie shoulders
                 sh_y = y1 + int(ih * 0.49)
                 sh_half_w = int(iw * 0.21)
                 left_shoulder = (cx - sh_half_w, sh_y)
@@ -634,7 +626,6 @@ class BidirectionalAvatar:
                 left_elbow = solve_anatomical_ik(left_shoulder, left_wrist, 82, 78, cx, side_sign=-1.0)
                 right_elbow = solve_anatomical_ik(right_shoulder, right_wrist, 82, 78, cx, side_sign=1.0)
 
-                # Hoodie sleeves + skin forearms emerging directly from his shoulders
                 draw_shaded_capsule(panel, left_shoulder, left_elbow, 17, 14, theme["outfit"], theme["outfit_border"])
                 draw_shaded_capsule(panel, right_shoulder, right_elbow, 17, 14, theme["outfit"], theme["outfit_border"])
                 draw_shaded_capsule(panel, left_elbow, left_wrist, 12, 9, theme["skin"], theme["skin_outline"])
@@ -760,7 +751,8 @@ class BidirectionalAvatar:
             self.target_vec = self.rest_vec
             self.is_signing = False
 
-        self.current_vec = self.current_vec * 0.55 + self.target_vec * 0.45
+        # Smooth, graceful interpolation between keyframes
+        self.current_vec = self.current_vec * 0.78 + self.target_vec * 0.22
 
         theme = AVATAR_THEMES[self.theme_idx]
         h, w, _ = panel.shape
