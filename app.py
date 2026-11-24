@@ -1,5 +1,6 @@
 import asyncio
 import base64
+import csv
 import http.server
 import json
 import math
@@ -8,7 +9,7 @@ import socketserver
 import threading
 import time
 import webbrowser
-from collections import Counter, deque
+from collections import Counter, defaultdict, deque
 
 os.environ['GLOG_minloglevel'] = '2'
 
@@ -39,6 +40,7 @@ from features import extract_holistic_features
 
 MODEL_FILE = 'sign_model.pkl'
 AVATAR_FILE = 'avatar_poses.json'
+DATA_CSV_FILE = 'data.csv'
 HTTP_PORT = 8000
 WS_PORT = 8765
 
@@ -48,9 +50,9 @@ MIN_PROB_MARGIN = 0.25
 SMOOTHING_WINDOW = 8
 
 # Fast female TTS voice pacing
-SAPI_RATE = 3           # Windows SAPI5 fast speed (-10 to +10; increase to 4 or 5 for even faster)
-PYTTSX3_RATE = 215      # Fallback fast speaking speed (WPM)
-WORD_GAP_SEC = 0.0      # Natural micro-gap from per-word SAPI calls (set e.g. 0.03 to add extra pause)
+SAPI_RATE = 3
+PYTTSX3_RATE = 215
+WORD_GAP_SEC = 0.0
 
 HAND_CONNECTIONS = [
     (0, 1), (1, 2), (2, 3), (3, 4),
@@ -64,7 +66,6 @@ UPPER_BODY_CONNECTIONS = [
     (11, 12), (11, 13), (13, 15), (12, 14), (14, 16), (0, 11), (0, 12)
 ]
 
-# Only true synonyms (never override distinct trained words like 'love' -> 'i_love_you')
 SYNONYMS = {
     "hi": "hello",
     "hey": "hello",
@@ -79,8 +80,13 @@ SYNONYMS = {
 _tts_lock = threading.Lock()
 
 
+def normalize_sign_key(text):
+    """Normalizes any sign label consistently."""
+    cleaned = "".join(ch for ch in text.lower() if ch.isalnum() or ch.isspace() or ch == '_')
+    return "_".join(cleaned.replace('_', ' ').split())
+
+
 def open_webcam_fast(cam_index=0):
-    """Opens the webcam rapidly on Windows via DirectShow (CAP_DSHOW), with fallback."""
     if os.name == 'nt':
         cap = cv2.VideoCapture(cam_index, cv2.CAP_DSHOW)
         if cap.isOpened():
@@ -111,7 +117,6 @@ def _select_female_voice_pyttsx3(engine):
 
 
 def speak_text_async(text):
-    """Speaks the accumulated sentence aloud quickly with crisp word separation."""
     words = [w.strip(".,!?;:") for w in text.strip().split() if w.strip(".,!?;:")]
     if not words:
         return
@@ -164,7 +169,6 @@ def speak_text_async(text):
 
 
 def gloss_to_sentence(tokens):
-    """Builds clean text directly from the signed glosses without injecting extra words."""
     if not tokens:
         return ""
     clean = []
@@ -214,10 +218,11 @@ def draw_detection_overlay(frame, hand_res, pose_res, label="", confidence=0.0, 
 
 
 # ==============================================================================
-# 3D AVATAR KINEMATICS CONTROLLER & UNIFIED STUDIO STATE
+# 3D AVATAR DATA-DRIVEN KINEMATICS CONTROLLER
 # ==============================================================================
 
 def normalize_2d_hand_pose(raw_63):
+    """Preserves exact recorded finger curl and spread while scaling to avatar hand size."""
     coords = np.array(raw_63, dtype=float).reshape(21, 3)
     xy_span = float(np.max(np.abs(coords[:, :2])))
     if xy_span < 1e-4:
@@ -245,15 +250,67 @@ def build_rest_hand_coords(inward_sign=1.0):
     return np.array(coords, dtype=float)
 
 
-class Avatar3DController:
-    def __init__(self, pose_file):
-        self.poses = {}
-        if os.path.isfile(pose_file):
-            with open(pose_file, 'r', encoding='utf-8') as f:
-                raw_poses = json.load(f)
-                self.poses = {k.strip().lower().replace(' ', '_'): v for k, v in raw_poses.items()}
+def load_recorded_sequences(csv_file, json_file):
+    """
+    Loads real recorded multi-frame sequences per sign directly from data.csv
+    so the 3D avatar replays the exact hand shapes and trajectories you recorded.
+    """
+    sequences = {}
+    display_names = {}
 
-        print(f"Loaded {len(self.poses)} 3D avatar gestures: {', '.join(sorted(self.poses.keys()))}")
+    if os.path.isfile(csv_file):
+        grouped = defaultdict(list)
+        raw_label_map = {}
+        try:
+            with open(csv_file, 'r', encoding='utf-8') as f:
+                reader = csv.reader(f)
+                header = next(reader, None)
+                if header:
+                    for row in reader:
+                        if len(row) < 208:
+                            continue
+                        raw_label = row[0].strip()
+                        norm_k = normalize_sign_key(raw_label)
+                        if not norm_k or norm_k == 'neutral':
+                            continue
+                        vals = [float(x) for x in row[1:208]]
+                        grouped[norm_k].append(vals)
+                        raw_label_map[norm_k] = raw_label.replace('_', ' ').strip().upper()
+
+            for norm_k, rows in grouped.items():
+                # Take the cleanest middle recording clip (8 representative keyframes)
+                arr = np.array(rows, dtype=float)
+                n = len(arr)
+                clip_len = min(n, 24)
+                start_idx = max(0, (n // 2) - (clip_len // 2))
+                clip = arr[start_idx:start_idx + clip_len]
+                sample_indices = np.linspace(0, len(clip) - 1, num=min(8, len(clip)), dtype=int)
+                sequences[norm_k] = clip[sample_indices]
+                display_names[norm_k] = raw_label_map[norm_k]
+        except Exception as e:
+            print(f"[Warning] Could not read {csv_file}: {e}")
+
+    # Supplement with any signs in avatar_poses.json not present in data.csv
+    if os.path.isfile(json_file):
+        with open(json_file, 'r', encoding='utf-8') as f:
+            raw_poses = json.load(f)
+            for k, v in raw_poses.items():
+                norm_k = normalize_sign_key(k)
+                if not norm_k or norm_k == 'neutral':
+                    continue
+                if norm_k not in sequences:
+                    arr = np.array(v, dtype=float)
+                    sequences[norm_k] = arr[np.newaxis, :] if arr.ndim == 1 else arr
+                    display_names[norm_k] = k.replace('_', ' ').strip().upper()
+
+    return sequences, display_names
+
+
+class Avatar3DController:
+    def __init__(self, pose_file, csv_file=DATA_CSV_FILE):
+        self.poses, self.display_names = load_recorded_sequences(csv_file, pose_file)
+        print(f"Loaded {len(self.poses)} real recorded 3D avatar gestures: {', '.join(sorted(self.poses.keys()))}")
+
         self.vec_dim = 207
         self.queue = deque()
         self.current_label = "IDLE / LISTENING"
@@ -262,8 +319,8 @@ class Avatar3DController:
         self.current_vec = self.rest_vec.copy()
         self.target_vec = self.rest_vec.copy()
         self.last_switch = time.time()
-        self.frame_duration = 0.45
-        vocab_preview = ", ".join(sorted(self.poses.keys()))
+        self.frame_duration = 0.24
+        vocab_preview = ", ".join(sorted(self.display_names.values()))
         self.status_text = f"Trained signs: {vocab_preview}"
 
     def _make_rest_vector(self):
@@ -274,91 +331,74 @@ class Avatar3DController:
         vec[174 + 30:174 + 33] = [0.46, 0.90, 0.0]
         return vec
 
-    def _prepare_pose_vector(self, raw_frame):
+    def _map_recorded_frame_to_avatar(self, raw_frame):
+        """
+        Directly converts a recorded feature vector into 3D avatar hand shapes
+        and upper-body wrist positions without overriding the user's real pose.
+        """
         padded = np.zeros(self.vec_dim, dtype=float)
         padded[:min(len(raw_frame), self.vec_dim)] = raw_frame[:self.vec_dim]
 
-        h_screen_left = padded[:63]
-        h_screen_right = padded[87:150]
-        left_active = max(abs(v) for v in h_screen_left) > 1e-4
-        right_active = max(abs(v) for v in h_screen_right) > 1e-4
+        h_left = padded[:63]
+        h_right = padded[87:150]
+        left_active = float(np.max(np.abs(h_left))) > 1e-4
+        right_active = float(np.max(np.abs(h_right))) > 1e-4
 
+        # Extract real recorded wrist positions (indices 15 & 16 in MediaPipe Pose -> [27:29], [30:32])
         pose = padded[174:207]
-        has_pose = max(abs(v) for v in pose) > 1e-4
+        has_pose = float(np.max(np.abs(pose))) > 1e-4
 
         if has_pose:
-            raw_lw = (pose[27], pose[28])
-            raw_rw = (pose[30], pose[31])
-            if raw_lw[0] > raw_rw[0]:
-                raw_lw, raw_rw = raw_rw, raw_lw
-        else:
-            raw_lw = (-0.34, 0.18)
-            raw_rw = (0.34, 0.18)
+            # In features.py, pose coordinates are normalized relative to shoulder center:
+            # X is in [-1.2, 1.2], Y is relative to shoulder line (negative = near face/chin, ~0.2-0.6 = chest)
+            rec_lx, rec_ly = float(pose[27]), float(pose[28])
+            rec_rx, rec_ry = float(pose[30]), float(pose[31])
 
-        left_w = (max(-0.82, min(0.14, raw_lw[0])), max(-0.68, min(0.84, raw_lw[1])))
-        right_w = (max(-0.14, min(0.82, raw_rw[0])), max(-0.68, min(0.84, raw_rw[1])))
+            # Ensure left/right wrist assignment matches screen-left / screen-right hands
+            if rec_lx > rec_rx:
+                rec_lx, rec_rx = rec_rx, rec_lx
+                rec_ly, rec_ry = rec_ry, rec_ly
+
+            # Map recorded shoulder-relative Y into avatar signing space ([-0.65, 0.65], strictly < 0.78)
+            lw_x = float(np.clip(rec_lx * 0.55, -0.78, 0.18))
+            lw_y = float(np.clip((rec_ly - 0.35) * 0.85, -0.65, 0.65))
+            rw_x = float(np.clip(rec_rx * 0.55, -0.18, 0.78))
+            rw_y = float(np.clip((rec_ry - 0.35) * 0.85, -0.65, 0.65))
+        else:
+            lw_x, lw_y = -0.26, 0.12
+            rw_x, rw_y = 0.26, 0.12
 
         if left_active:
-            padded[:63] = normalize_2d_hand_pose(h_screen_left)
-            padded[174 + 27:174 + 29] = [left_w[0], left_w[1]]
+            padded[:63] = normalize_2d_hand_pose(h_left)
+            padded[174 + 27:174 + 29] = [lw_x, lw_y]
         else:
             padded[:63] = build_rest_hand_coords(inward_sign=1.0)
             padded[174 + 27:174 + 29] = [-0.46, 0.90]
 
         if right_active:
-            padded[87:150] = normalize_2d_hand_pose(h_screen_right)
-            padded[174 + 30:174 + 32] = [right_w[0], right_w[1]]
+            padded[87:150] = normalize_2d_hand_pose(h_right)
+            padded[174 + 30:174 + 32] = [rw_x, rw_y]
         else:
             padded[87:150] = build_rest_hand_coords(inward_sign=-1.0)
             padded[174 + 30:174 + 32] = [0.46, 0.90]
 
         return padded
 
-    def _apply_kinematic_motion(self, base_vec, word_key, step_idx, total_steps):
-        vec = base_vec.copy()
-        left_active = max(abs(v) for v in base_vec[:63]) > 1e-4 and (base_vec[174 + 28] < 0.78)
-        right_active = max(abs(v) for v in base_vec[87:150]) > 1e-4 and (base_vec[174 + 31] < 0.78)
-
-        phase = step_idx / max(1, total_steps - 1)
-        dx, dy = 0.0, 0.0
-
-        if step_idx == 0:
-            dy = 0.22
-        elif 'hello' in word_key:
-            dx = math.sin(phase * math.pi * 2.5) * 0.14
-        elif 'yes' in word_key:
-            dy = math.sin(phase * math.pi * 2.5) * 0.13
-        elif 'no' in word_key:
-            dx = math.sin(phase * math.pi * 3.0) * 0.14
-        elif 'thank' in word_key or 'please' in word_key:
-            dx = phase * 0.10
-            dy = phase * 0.16
-        else:
-            pulse = math.sin(phase * math.pi * 2.0)
-            dx = pulse * 0.08
-            dy = -abs(pulse) * 0.09
-
-        if left_active:
-            vec[174 + 27] = max(-0.84, min(0.16, vec[174 + 27] - dx))
-            vec[174 + 28] = max(-0.70, min(0.84, vec[174 + 28] + dy))
-
-        if right_active:
-            vec[174 + 30] = max(-0.16, min(0.84, vec[174 + 30] + dx))
-            vec[174 + 31] = max(-0.70, min(0.84, vec[174 + 31] + dy))
-
-        return vec
-
-    def _enqueue_key(self, key_name, custom_label=None, steps=5):
+    def _enqueue_key(self, key_name, custom_label=None):
         if key_name not in self.poses:
             return
-        display_label = custom_label or key_name.replace('_', ' ').upper()
-        arr = np.array(self.poses[key_name], dtype=float)
-        raw_frames = [arr] if arr.ndim == 1 else list(arr)
-        for idx in range(steps):
-            src_frame = raw_frames[min(len(raw_frames) - 1, int(idx * len(raw_frames) / steps))]
-            prepared = self._prepare_pose_vector(src_frame)
-            animated = self._apply_kinematic_motion(prepared, display_label.lower(), idx, steps)
-            self.queue.append((display_label, animated))
+        display_label = custom_label or self.display_names.get(key_name, key_name.replace('_', ' ').upper())
+        raw_frames = self.poses[key_name]
+
+        mapped_frames = [self._map_recorded_frame_to_avatar(fr) for fr in raw_frames]
+        # Repeat short clips slightly so the human eye clearly sees the full gesture
+        if len(mapped_frames) == 1:
+            mapped_frames = mapped_frames * 6
+        elif len(mapped_frames) < 6:
+            mapped_frames = mapped_frames + mapped_frames[::-1]
+
+        for frame_vec in mapped_frames:
+            self.queue.append((display_label, frame_vec))
 
     def enqueue_sentence(self, sentence):
         clean = "".join(ch for ch in sentence.lower() if ch.isalnum() or ch.isspace()).strip()
@@ -367,10 +407,10 @@ class Avatar3DController:
 
         self.queue.clear()
 
-        phrase_key = "_".join(clean.split())
+        phrase_key = normalize_sign_key(clean)
         if phrase_key in self.poses:
             self._enqueue_key(phrase_key)
-            self.status_text = f"Signing: {phrase_key.replace('_', ' ').upper()}"
+            self.status_text = f"Signing: {self.display_names.get(phrase_key, phrase_key.upper())}"
             return
 
         words = clean.split()
@@ -380,12 +420,12 @@ class Avatar3DController:
 
         while i < len(words):
             matched_multi = False
-            for span in (3, 2):
+            for span in (4, 3, 2):
                 if i + span <= len(words):
-                    sub = "_".join(words[i:i + span])
+                    sub = normalize_sign_key(" ".join(words[i:i + span]))
                     if sub in self.poses:
                         self._enqueue_key(sub)
-                        matched_tokens.append(sub.replace('_', ' ').upper())
+                        matched_tokens.append(self.display_names.get(sub, sub.upper()))
                         i += span
                         matched_multi = True
                         break
@@ -395,15 +435,15 @@ class Avatar3DController:
             raw_word = words[i]
             if raw_word in self.poses:
                 self._enqueue_key(raw_word)
-                matched_tokens.append(raw_word.upper())
+                matched_tokens.append(self.display_names.get(raw_word, raw_word.upper()))
             else:
                 mapped = SYNONYMS.get(raw_word)
                 if mapped and mapped in self.poses:
                     self._enqueue_key(mapped)
-                    matched_tokens.append(mapped.replace('_', ' ').upper())
+                    matched_tokens.append(self.display_names.get(mapped, mapped.upper()))
                 elif len(raw_word) > 1 and all(ch in self.poses for ch in raw_word):
                     for ch in raw_word:
-                        self._enqueue_key(ch, custom_label=f"SPELL: {ch.upper()}", steps=3)
+                        self._enqueue_key(ch, custom_label=f"SPELL: {ch.upper()}")
                     matched_tokens.append(f"SPELL({raw_word.upper()})")
                 else:
                     unknown_tokens.append(raw_word.upper())
@@ -424,19 +464,19 @@ class Avatar3DController:
             self.target_vec = vec
             self.last_switch = now
             self.is_signing = True
-        elif not self.queue and (now - self.last_switch) >= self.frame_duration * 2.2:
+        elif not self.queue and (now - self.last_switch) >= self.frame_duration * 2.5:
             self.current_label = "IDLE / LISTENING"
             self.target_vec = self.rest_vec
             self.is_signing = False
 
-        self.current_vec = self.current_vec * 0.78 + self.target_vec * 0.22
+        self.current_vec = self.current_vec * 0.62 + self.target_vec * 0.38
         pose = self.current_vec[174:207]
 
         return {
             "label": self.current_label,
             "is_signing": self.is_signing,
             "status": self.status_text,
-            "available_signs": sorted(self.poses.keys()),
+            "available_signs": sorted(self.display_names.values()),
             "left_hand": [round(float(x), 4) for x in self.current_vec[:63]],
             "right_hand": [round(float(x), 4) for x in self.current_vec[87:150]],
             "left_wrist": [round(float(pose[27]), 4), round(float(pose[28]), 4)],
@@ -575,7 +615,6 @@ def main():
         print(f"Missing '{MODEL_FILE}'. Run train.py first!")
         return
 
-    # Open webcam in parallel while MediaPipe models & servers load
     cam_holder = {"cap": None}
 
     def _warm_camera():
@@ -585,7 +624,7 @@ def main():
     cam_thread.start()
 
     clf = joblib.load(MODEL_FILE)
-    avatar = Avatar3DController(AVATAR_FILE)
+    avatar = Avatar3DController(AVATAR_FILE, DATA_CSV_FILE)
     studio = UnifiedStudioState(avatar)
     start_servers(studio)
 
