@@ -44,10 +44,11 @@ DATA_CSV_FILE = 'data.csv'
 HTTP_PORT = 8000
 WS_PORT = 8765
 
-# Anti-false-positive thresholds
-MIN_CONFIDENCE = 0.75
+# Stage-safe anti-false-positive thresholds
+MIN_CONFIDENCE = 0.78
 MIN_PROB_MARGIN = 0.25
 SMOOTHING_WINDOW = 8
+STABLE_FRAMES_REQUIRED = 12
 
 # Fast female TTS voice pacing
 SAPI_RATE = 3
@@ -252,8 +253,8 @@ def build_rest_hand_coords(inward_sign=1.0):
 
 def load_recorded_sequences(csv_file, json_file):
     """
-    Loads real recorded multi-frame sequences per sign directly from data.csv
-    so the 3D avatar replays the exact hand shapes and trajectories you recorded.
+    Loads the MOST RECENT recorded multi-frame sequence per sign from data.csv
+    (taking the tail rows so retrained signs immediately replace older takes).
     """
     sequences = {}
     display_names = {}
@@ -271,32 +272,32 @@ def load_recorded_sequences(csv_file, json_file):
                             continue
                         raw_label = row[0].strip()
                         norm_k = normalize_sign_key(raw_label)
-                        if not norm_k or norm_k == 'neutral':
+                        if not norm_k or norm_k in ('neutral', '_neutral_'):
                             continue
                         vals = [float(x) for x in row[1:208]]
                         grouped[norm_k].append(vals)
                         raw_label_map[norm_k] = raw_label.replace('_', ' ').strip().upper()
 
             for norm_k, rows in grouped.items():
-                # Take the cleanest middle recording clip (8 representative keyframes)
                 arr = np.array(rows, dtype=float)
-                n = len(arr)
-                clip_len = min(n, 24)
-                start_idx = max(0, (n // 2) - (clip_len // 2))
-                clip = arr[start_idx:start_idx + clip_len]
-                sample_indices = np.linspace(0, len(clip) - 1, num=min(8, len(clip)), dtype=int)
+                hand_energy = np.sum(np.abs(arr[:, :63]), axis=1) + np.sum(np.abs(arr[:, 87:150]), axis=1)
+                active_rows = arr[hand_energy > 0.5]
+                src = active_rows if len(active_rows) >= 6 else arr
+                # Take the LATEST recording at the end of data.csv (not stale earlier rows)
+                clip_len = min(len(src), 24)
+                clip = src[-clip_len:]
+                sample_indices = np.linspace(0, len(clip) - 1, num=min(9, len(clip)), dtype=int)
                 sequences[norm_k] = clip[sample_indices]
                 display_names[norm_k] = raw_label_map[norm_k]
         except Exception as e:
             print(f"[Warning] Could not read {csv_file}: {e}")
 
-    # Supplement with any signs in avatar_poses.json not present in data.csv
     if os.path.isfile(json_file):
         with open(json_file, 'r', encoding='utf-8') as f:
             raw_poses = json.load(f)
             for k, v in raw_poses.items():
                 norm_k = normalize_sign_key(k)
-                if not norm_k or norm_k == 'neutral':
+                if not norm_k or norm_k in ('neutral', '_neutral_'):
                     continue
                 if norm_k not in sequences:
                     arr = np.array(v, dtype=float)
@@ -319,7 +320,7 @@ class Avatar3DController:
         self.current_vec = self.rest_vec.copy()
         self.target_vec = self.rest_vec.copy()
         self.last_switch = time.time()
-        self.frame_duration = 0.24
+        self.frame_duration = 0.36  # Readable human signing cadence
         vocab_preview = ", ".join(sorted(self.display_names.values()))
         self.status_text = f"Trained signs: {vocab_preview}"
 
@@ -332,10 +333,6 @@ class Avatar3DController:
         return vec
 
     def _map_recorded_frame_to_avatar(self, raw_frame):
-        """
-        Directly converts a recorded feature vector into 3D avatar hand shapes
-        and upper-body wrist positions without overriding the user's real pose.
-        """
         padded = np.zeros(self.vec_dim, dtype=float)
         padded[:min(len(raw_frame), self.vec_dim)] = raw_frame[:self.vec_dim]
 
@@ -344,26 +341,21 @@ class Avatar3DController:
         left_active = float(np.max(np.abs(h_left))) > 1e-4
         right_active = float(np.max(np.abs(h_right))) > 1e-4
 
-        # Extract real recorded wrist positions (indices 15 & 16 in MediaPipe Pose -> [27:29], [30:32])
         pose = padded[174:207]
         has_pose = float(np.max(np.abs(pose))) > 1e-4
 
         if has_pose:
-            # In features.py, pose coordinates are normalized relative to shoulder center:
-            # X is in [-1.2, 1.2], Y is relative to shoulder line (negative = near face/chin, ~0.2-0.6 = chest)
             rec_lx, rec_ly = float(pose[27]), float(pose[28])
             rec_rx, rec_ry = float(pose[30]), float(pose[31])
 
-            # Ensure left/right wrist assignment matches screen-left / screen-right hands
             if rec_lx > rec_rx:
                 rec_lx, rec_rx = rec_rx, rec_lx
                 rec_ly, rec_ry = rec_ry, rec_ly
 
-            # Map recorded shoulder-relative Y into avatar signing space ([-0.65, 0.65], strictly < 0.78)
-            lw_x = float(np.clip(rec_lx * 0.55, -0.78, 0.18))
-            lw_y = float(np.clip((rec_ly - 0.35) * 0.85, -0.65, 0.65))
-            rw_x = float(np.clip(rec_rx * 0.55, -0.18, 0.78))
-            rw_y = float(np.clip((rec_ry - 0.35) * 0.85, -0.65, 0.65))
+            lw_x = float(np.clip(rec_lx * 0.62, -0.82, 0.22))
+            lw_y = float(np.clip((rec_ly - 0.28) * 0.92, -0.72, 0.68))
+            rw_x = float(np.clip(rec_rx * 0.62, -0.22, 0.82))
+            rw_y = float(np.clip((rec_ry - 0.28) * 0.92, -0.72, 0.68))
         else:
             lw_x, lw_y = -0.26, 0.12
             rw_x, rw_y = 0.26, 0.12
@@ -391,7 +383,6 @@ class Avatar3DController:
         raw_frames = self.poses[key_name]
 
         mapped_frames = [self._map_recorded_frame_to_avatar(fr) for fr in raw_frames]
-        # Repeat short clips slightly so the human eye clearly sees the full gesture
         if len(mapped_frames) == 1:
             mapped_frames = mapped_frames * 6
         elif len(mapped_frames) < 6:
@@ -464,12 +455,13 @@ class Avatar3DController:
             self.target_vec = vec
             self.last_switch = now
             self.is_signing = True
-        elif not self.queue and (now - self.last_switch) >= self.frame_duration * 2.5:
+        elif not self.queue and (now - self.last_switch) >= self.frame_duration * 2.2:
             self.current_label = "IDLE / LISTENING"
             self.target_vec = self.rest_vec
             self.is_signing = False
 
-        self.current_vec = self.current_vec * 0.62 + self.target_vec * 0.38
+        # Fluid human-like easing curve between keyframes
+        self.current_vec = self.current_vec * 0.72 + self.target_vec * 0.28
         pose = self.current_vec[174:207]
 
         return {
@@ -705,7 +697,7 @@ def main():
                             last_added_token = live_label
                             stable_count = 1
 
-                        if stable_count == 10:
+                        if stable_count == STABLE_FRAMES_REQUIRED:
                             with studio.lock:
                                 if not studio.gloss_stream or studio.gloss_stream[-1] != live_label:
                                     studio.gloss_stream.append(live_label)

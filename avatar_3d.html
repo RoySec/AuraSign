@@ -13,16 +13,11 @@
       --bg-panel: rgba(13, 18, 28, 0.74);
       --bg-card: rgba(18, 24, 38, 0.78);
       --border-subtle: rgba(255, 255, 255, 0.08);
-      --border-glow-cyan: rgba(56, 189, 248, 0.35);
-      --border-glow-emerald: rgba(52, 211, 153, 0.35);
       --text-primary: #f1f5f9;
       --text-secondary: #94a3b8;
       --text-muted: #64748b;
-      --accent-emerald: #10b981;
       --accent-emerald-bright: #34d399;
-      --accent-cyan: #0ea5e9;
       --accent-cyan-bright: #38bdf8;
-      --accent-indigo: #818cf8;
       --font-sans: 'Plus Jakarta Sans', 'Segoe UI', system-ui, -apple-system, sans-serif;
       --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, monospace;
     }
@@ -44,7 +39,6 @@
         radial-gradient(circle at 50% 95%, rgba(99, 102, 241, 0.07), transparent 45%);
     }
 
-    /* TOP STUDIO HEADER BAR */
     .topbar {
       height: 54px;
       padding: 0 22px;
@@ -58,11 +52,7 @@
       flex-shrink: 0;
     }
 
-    .brand {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
+    .brand { display: flex; align-items: center; gap: 12px; }
 
     .brand-logo {
       width: 32px;
@@ -98,11 +88,7 @@
       letter-spacing: 0.4px;
     }
 
-    .topbar-right {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
+    .topbar-right { display: flex; align-items: center; gap: 10px; }
 
     .badge {
       display: inline-flex;
@@ -140,7 +126,6 @@
       50% { opacity: 0.45; transform: scale(0.82); }
     }
 
-    /* 50/50 SPLIT-SCREEN STUDIO GRID */
     .studio-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -149,7 +134,6 @@
       width: 100vw;
     }
 
-    /* LEFT PANE: SIGN -> TEXT & SPEECH */
     .left-pane {
       display: flex;
       flex-direction: column;
@@ -161,12 +145,7 @@
       position: relative;
     }
 
-    .pane-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 12px;
-    }
+    .pane-header { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
 
     .step-pill {
       display: inline-flex;
@@ -178,9 +157,7 @@
       color: var(--accent-emerald-bright);
     }
 
-    .step-pill.blue {
-      color: var(--accent-cyan-bright);
-    }
+    .step-pill.blue { color: var(--accent-cyan-bright); }
 
     .step-num {
       font-family: var(--font-mono);
@@ -196,13 +173,8 @@
       border-color: rgba(56, 189, 248, 0.35);
     }
 
-    .pane-sub {
-      font-size: 0.79rem;
-      color: var(--text-secondary);
-      margin-top: 3px;
-    }
+    .pane-sub { font-size: 0.79rem; color: var(--text-secondary); margin-top: 3px; }
 
-    /* VIEWFINDER WITH HUD CORNERS */
     .cam-wrapper {
       position: relative;
       flex: 1;
@@ -214,21 +186,16 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      box-shadow:
-        inset 0 0 40px rgba(0, 0, 0, 0.65),
-        0 14px 34px rgba(0, 0, 0, 0.45);
+      box-shadow: inset 0 0 40px rgba(0, 0, 0, 0.65), 0 14px 34px rgba(0, 0, 0, 0.45);
       transition: border-color 0.25s ease, box-shadow 0.25s ease;
     }
 
     .cam-wrapper.active-sign {
       border-color: rgba(52, 211, 153, 0.45);
-      box-shadow:
-        inset 0 0 30px rgba(16, 185, 129, 0.08),
-        0 0 28px rgba(16, 185, 129, 0.14);
+      box-shadow: inset 0 0 30px rgba(16, 185, 129, 0.08), 0 0 28px rgba(16, 185, 129, 0.14);
     }
 
-    .cam-wrapper::before,
-    .cam-wrapper::after {
+    .cam-wrapper::before, .cam-wrapper::after {
       content: "";
       position: absolute;
       width: 22px;
@@ -238,25 +205,10 @@
       border-color: rgba(52, 211, 153, 0.55);
       border-style: solid;
     }
-    .cam-wrapper::before {
-      top: 12px;
-      right: 12px;
-      border-width: 2px 2px 0 0;
-      border-top-right-radius: 6px;
-    }
-    .cam-wrapper::after {
-      bottom: 12px;
-      left: 12px;
-      border-width: 0 0 2px 2px;
-      border-bottom-left-radius: 6px;
-    }
+    .cam-wrapper::before { top: 12px; right: 12px; border-width: 2px 2px 0 0; border-top-right-radius: 6px; }
+    .cam-wrapper::after { bottom: 12px; left: 12px; border-width: 0 0 2px 2px; border-bottom-left-radius: 6px; }
 
-    #cam-feed {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      display: block;
-    }
+    #cam-feed { width: 100%; height: 100%; object-fit: cover; display: block; }
 
     .cam-overlay-pill {
       position: absolute;
@@ -285,7 +237,6 @@
       box-shadow: 0 0 18px rgba(16, 185, 129, 0.25);
     }
 
-    /* RECOGNITION OUTPUT CARD */
     .output-card {
       background: var(--bg-card);
       backdrop-filter: blur(16px);
@@ -298,13 +249,7 @@
       box-shadow: 0 12px 32px rgba(0, 0, 0, 0.35);
     }
 
-    .gloss-row {
-      display: flex;
-      align-items: center;
-      gap: 7px;
-      flex-wrap: wrap;
-      min-height: 28px;
-    }
+    .gloss-row { display: flex; align-items: center; gap: 7px; flex-wrap: wrap; min-height: 28px; }
 
     .gloss-label {
       font-family: var(--font-mono);
@@ -327,10 +272,7 @@
       animation: chipPop 0.22s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
-    .gloss-arrow {
-      color: var(--text-muted);
-      font-size: 0.75rem;
-    }
+    .gloss-arrow { color: var(--text-muted); font-size: 0.75rem; }
 
     @keyframes chipPop {
       from { opacity: 0; transform: scale(0.85) translateY(3px); }
@@ -351,26 +293,10 @@
       box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.45);
     }
 
-    .sentence-box.empty {
-      color: var(--text-muted);
-      font-weight: 500;
-      font-size: 0.94rem;
-    }
+    .sentence-box.empty { color: var(--text-muted); font-weight: 500; font-size: 0.94rem; }
 
-    /* RIGHT PANE: SPEECH / TEXT -> 3D HUMAN AVATAR */
-    .right-pane {
-      position: relative;
-      height: 100%;
-      width: 100%;
-      overflow: hidden;
-      background: #070a10;
-    }
-
-    #three-stage {
-      position: absolute;
-      inset: 0;
-      z-index: 1;
-    }
+    .right-pane { position: relative; height: 100%; width: 100%; overflow: hidden; background: #070a10; }
+    #three-stage { position: absolute; inset: 0; z-index: 1; }
 
     .hud-top-right {
       position: absolute;
@@ -460,12 +386,7 @@
       transform: translateY(-1px);
     }
 
-    .controls-row {
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-      align-items: center;
-    }
+    .controls-row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
 
     input[type="text"] {
       background: rgba(6, 9, 15, 0.88);
@@ -509,10 +430,6 @@
       transform: translateY(-1px);
     }
 
-    button:active, label.btn:active {
-      transform: translateY(0);
-    }
-
     button.primary {
       background: linear-gradient(135deg, #0284c7 0%, #2563eb 100%);
       border-color: rgba(56, 189, 248, 0.55);
@@ -520,21 +437,11 @@
       box-shadow: 0 4px 16px rgba(2, 132, 199, 0.3);
     }
 
-    button.primary:hover {
-      background: linear-gradient(135deg, #0369a1 0%, #1d4ed8 100%);
-      box-shadow: 0 6px 20px rgba(2, 132, 199, 0.45);
-    }
-
     button.success {
       background: linear-gradient(135deg, #059669 0%, #0d9488 100%);
       border-color: rgba(52, 211, 153, 0.55);
       color: #fff;
       box-shadow: 0 4px 16px rgba(5, 150, 105, 0.28);
-    }
-
-    button.success:hover {
-      background: linear-gradient(135deg, #047857 0%, #0f766e 100%);
-      box-shadow: 0 6px 20px rgba(5, 150, 105, 0.42);
     }
 
     button.listening {
@@ -545,19 +452,9 @@
     }
 
     #glb-input { display: none; }
+    .drop-hint { font-size: 0.74rem; color: var(--text-secondary); margin-top: 6px; }
+    .drop-hint b { color: var(--accent-cyan-bright); font-weight: 600; }
 
-    .drop-hint {
-      font-size: 0.74rem;
-      color: var(--text-secondary);
-      margin-top: 6px;
-    }
-
-    .drop-hint b {
-      color: var(--accent-cyan-bright);
-      font-weight: 600;
-    }
-
-    /* DRAG OVERLAY */
     .drop-curtain {
       position: fixed;
       inset: 0;
@@ -572,16 +469,8 @@
       pointer-events: none;
     }
 
-    .drop-curtain.visible {
-      display: grid;
-    }
-
-    .drop-curtain-text {
-      font-size: 1.35rem;
-      font-weight: 700;
-      color: var(--accent-cyan-bright);
-      text-align: center;
-    }
+    .drop-curtain.visible { display: grid; }
+    .drop-curtain-text { font-size: 1.35rem; font-weight: 700; color: var(--accent-cyan-bright); text-align: center; }
   </style>
   <script type="importmap">
     {
@@ -597,7 +486,6 @@
     <div class="drop-curtain-text">Drop 3D Human Model (.GLB / .GLTF) to Rig &amp; Animate</div>
   </div>
 
-  <!-- UNIFIED TOP HEADER -->
   <header class="topbar">
     <div class="brand">
       <div class="brand-logo">AS</div>
@@ -612,7 +500,6 @@
   </header>
 
   <div class="studio-grid">
-    <!-- LEFT HALF: LIVE SIGN RECOGNITION INPUT -->
     <section class="left-pane">
       <div class="pane-header">
         <div>
@@ -645,7 +532,6 @@
       </div>
     </section>
 
-    <!-- RIGHT HALF: SPEECH / TEXT -> 3D HUMAN AVATAR -->
     <section class="right-pane">
       <div id="three-stage"></div>
 
@@ -653,7 +539,7 @@
         <div class="glass-card" style="max-width: 100%;">
           <div class="step-pill blue"><span class="step-num">02</span> SPEECH / TEXT &rarr; 3D SIGN AVATAR</div>
           <div class="pane-sub" id="status-text">Connecting to Python engine...</div>
-          <div class="drop-hint" id="model-info">Rig: Studio 3D Rig (Drag &amp; drop <b>character.glb</b> anywhere for realistic human)</div>
+          <div class="drop-hint" id="model-info">Rig: Studio 3D Rig (Loading <b>character.gltf</b> or drag &amp; drop <b>.glb</b>)</div>
         </div>
       </div>
 
@@ -691,7 +577,6 @@
     import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
     import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 
-    // 1. THREE.JS STAGE SIZED TO RIGHT HALF OF SCREEN
     const stage = document.getElementById('three-stage');
     const scene = new THREE.Scene();
     scene.background = new THREE.Color(0x070a10);
@@ -727,10 +612,7 @@
     controls.addEventListener('start', () => { camTween = null; });
 
     function flyCameraTo(pos, target) {
-      camTween = {
-        pos: new THREE.Vector3(...pos),
-        target: new THREE.Vector3(...target)
-      };
+      camTween = { pos: new THREE.Vector3(...pos), target: new THREE.Vector3(...target) };
     }
 
     const resizeObserver = new ResizeObserver(() => {
@@ -744,7 +626,6 @@
     });
     resizeObserver.observe(stage);
 
-    // 3-Point Studio Lighting
     scene.add(new THREE.HemisphereLight(0xf8fafc, 0x1e293b, 0.85));
 
     const keyLight = new THREE.DirectionalLight(0xfff7ed, 1.9);
@@ -762,7 +643,6 @@
     fillLight.position.set(2.0, 1.4, -1.4);
     scene.add(fillLight);
 
-    // Architectural Studio Pedestal & Glowing Accent Rings
     const floor = new THREE.Mesh(
       new THREE.CircleGeometry(3.8, 64),
       new THREE.MeshStandardMaterial({ color: 0x0b0f19, roughness: 0.72, metalness: 0.18 })
@@ -787,7 +667,6 @@
     ringOuter.position.y = 0.002;
     scene.add(ringOuter);
 
-    // Subtle Floating Ambient Studio Particles
     const particleCount = 70;
     const pPositions = new Float32Array(particleCount * 3);
     for (let i = 0; i < particleCount; i++) {
@@ -797,16 +676,11 @@
     }
     const pGeo = new THREE.BufferGeometry();
     pGeo.setAttribute('position', new THREE.BufferAttribute(pPositions, 3));
-    const pMat = new THREE.PointsMaterial({
-      color: 0x7dd3fc,
-      size: 0.016,
-      transparent: true,
-      opacity: 0.42
-    });
-    const ambientParticles = new THREE.Points(pGeo, pMat);
+    const ambientParticles = new THREE.Points(pGeo, new THREE.PointsMaterial({
+      color: 0x7dd3fc, size: 0.016, transparent: true, opacity: 0.42
+    }));
     scene.add(ambientParticles);
 
-    // 2. LIVE POSE STATE
     const state = {
       label: 'IDLE / LISTENING',
       isSigning: false,
@@ -816,10 +690,10 @@
       rightHand: new Array(63).fill(0),
     };
 
-    // 3. BUILT-IN FALLBACK 3D CHARACTER
     function createFallbackCharacter() {
       const root = new THREE.Group();
       const skinMat = new THREE.MeshPhysicalMaterial({ color: 0xe8b496, roughness: 0.52, clearcoat: 0.08 });
+      const palmBackMat = new THREE.MeshPhysicalMaterial({ color: 0xd49b7c, roughness: 0.58 });
       const jacketMat = new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.55, metalness: 0.1 });
       const shirtMat = new THREE.MeshStandardMaterial({ color: 0xf1f5f9, roughness: 0.5 });
       const hairMat = new THREE.MeshStandardMaterial({ color: 0x181512, roughness: 0.7 });
@@ -892,24 +766,26 @@
         wristPivot.position.set(0, -foreLen, 0);
         elbowPivot.add(wristPivot);
 
-        const palm = new THREE.Mesh(new THREE.BoxGeometry(0.078, 0.088, 0.026), skinMat);
-        palm.position.y = -0.044;
+        const palm = new THREE.Mesh(new THREE.BoxGeometry(0.082, 0.092, 0.024), [
+          skinMat, skinMat, skinMat, skinMat, skinMat, palmBackMat
+        ]);
+        palm.position.y = -0.046;
         palm.castShadow = true;
         wristPivot.add(palm);
 
         const fingerSpecs = [
-          { name: 'thumb', x: -sideSign * 0.042, y: -0.035, len: [0.028, 0.024, 0.020], r: 0.011, isThumb: true },
-          { name: 'index', x: -sideSign * 0.028, y: -0.088, len: [0.032, 0.026, 0.020], r: 0.0095, isThumb: false },
-          { name: 'middle', x: -sideSign * 0.009, y: -0.090, len: [0.035, 0.028, 0.021], r: 0.010, isThumb: false },
-          { name: 'ring', x: sideSign * 0.010, y: -0.088, len: [0.032, 0.026, 0.020], r: 0.0095, isThumb: false },
-          { name: 'pinky', x: sideSign * 0.028, y: -0.084, len: [0.026, 0.021, 0.017], r: 0.0085, isThumb: false },
+          { name: 'thumb', x: -sideSign * 0.044, y: -0.034, len: [0.030, 0.025, 0.021], r: 0.0115, isThumb: true },
+          { name: 'index', x: -sideSign * 0.029, y: -0.092, len: [0.034, 0.028, 0.022], r: 0.010, isThumb: false },
+          { name: 'middle', x: -sideSign * 0.010, y: -0.094, len: [0.037, 0.030, 0.023], r: 0.0105, isThumb: false },
+          { name: 'ring', x: sideSign * 0.010, y: -0.092, len: [0.034, 0.028, 0.022], r: 0.010, isThumb: false },
+          { name: 'pinky', x: sideSign * 0.029, y: -0.088, len: [0.028, 0.023, 0.019], r: 0.009, isThumb: false },
         ];
 
         const fingers = {};
         for (const f of fingerSpecs) {
           const j1 = new THREE.Group();
           j1.position.set(f.x, f.y, 0);
-          if (f.isThumb) j1.rotation.z = -sideSign * 0.55;
+          if (f.isThumb) j1.rotation.z = -sideSign * 0.62;
           wristPivot.add(j1);
 
           const m1 = new THREE.Mesh(new THREE.CapsuleGeometry(f.r, f.len[0] * 0.65, 6, 10), skinMat);
@@ -943,7 +819,7 @@
     let proceduralRig = createFallbackCharacter();
     scene.add(proceduralRig.root);
 
-    // 4. UNIVERSAL REAL-HUMAN .GLB LOADER & SKELETAL RETARGETER
+    // REAL-HUMAN .GLB / .GLTF LOADER
     let gltfRig = null;
     const loader = new GLTFLoader();
 
@@ -963,20 +839,14 @@
       return null;
     }
 
-    function bindGLBModel(gltfScene) {
-      if (proceduralRig) {
-        scene.remove(proceduralRig.root);
-        proceduralRig = null;
-      }
-      if (gltfRig) {
-        scene.remove(gltfRig.root);
-      }
+    function bindGLBModel(gltfScene, sourceLabel = 'character.gltf') {
+      if (proceduralRig) { scene.remove(proceduralRig.root); proceduralRig = null; }
+      if (gltfRig) { scene.remove(gltfRig.root); }
 
       const box = new THREE.Box3().setFromObject(gltfScene);
       const size = new THREE.Vector3();
       box.getSize(size);
-      const scale = 1.72 / Math.max(size.y, 0.01);
-      gltfScene.scale.setScalar(scale);
+      gltfScene.scale.setScalar(1.72 / Math.max(size.y, 0.01));
 
       const scaledBox = new THREE.Box3().setFromObject(gltfScene);
       const center = new THREE.Vector3();
@@ -989,19 +859,8 @@
           obj.castShadow = true;
           obj.receiveShadow = true;
           obj.frustumCulled = false;
-          const mats = Array.isArray(obj.material) ? obj.material : [obj.material];
-          for (const m of mats) {
-            if (!m) continue;
-            const mName = (m.name || '').toLowerCase();
-            if (mName.includes('skin') || mName.includes('head') || mName.includes('body') || mName.includes('hand')) {
-              m.roughness = Math.max(m.roughness ?? 0.5, 0.58);
-              m.metalness = 0.0;
-            }
-          }
         }
-        if (obj.isBone) {
-          boneList.push({ key: normalizeBoneKey(obj.name), bone: obj });
-        }
+        if (obj.isBone) boneList.push({ key: normalizeBoneKey(obj.name), bone: obj });
       });
 
       const restQuats = new Map();
@@ -1009,43 +868,33 @@
       for (const { bone } of boneList) {
         restQuats.set(bone, bone.quaternion.clone());
         const childBone = bone.children.find((c) => c.isBone);
-        if (childBone && childBone.position.lengthSq() > 1e-6) {
-          restChildDirs.set(bone, childBone.position.clone().normalize());
-        } else {
-          restChildDirs.set(bone, new THREE.Vector3(0, 1, 0));
-        }
+        restChildDirs.set(bone, (childBone && childBone.position.lengthSq() > 1e-6)
+          ? childBone.position.clone().normalize()
+          : new THREE.Vector3(0, 1, 0));
       }
 
       function mapSide(sideWord, shortLetter) {
-        const arm = findBoneByCandidates(boneList, [
-          `${sideWord}arm`, `${sideWord}upperarm`, `upperarm${shortLetter}`, `arm${shortLetter}`
-        ]);
-        const fore = findBoneByCandidates(boneList, [
-          `${sideWord}forearm`, `${sideWord}lowerarm`, `lowerarm${shortLetter}`, `forearm${shortLetter}`
-        ]);
-        const hand = findBoneByCandidates(boneList, [
-          `${sideWord}hand`, `hand${shortLetter}`
-        ]);
-
+        const shoulder = findBoneByCandidates(boneList, [`${sideWord}shoulder`, `clavicle${shortLetter}`, `shoulder${shortLetter}`]);
+        const arm = findBoneByCandidates(boneList, [`${sideWord}arm`, `${sideWord}upperarm`, `upperarm${shortLetter}`, `arm${shortLetter}`]);
+        const fore = findBoneByCandidates(boneList, [`${sideWord}forearm`, `${sideWord}lowerarm`, `lowerarm${shortLetter}`, `forearm${shortLetter}`]);
+        const hand = findBoneByCandidates(boneList, [`${sideWord}hand`, `hand${shortLetter}`]);
         const fingers = {};
         for (const fName of ['thumb', 'index', 'middle', 'ring', 'pinky']) {
           const joints = [];
           for (let j = 1; j <= 3; j++) {
             const jBone = findBoneByCandidates(boneList, [
-              `${sideWord}hand${fName}${j}`,
-              `${sideWord}hand${fName}0${j}`,
-              `${fName}0${j}${shortLetter}`,
-              `${fName}${j}${shortLetter}`,
-              `${sideWord}${fName}${j}`
+              `${sideWord}hand${fName}${j}`, `${sideWord}hand${fName}0${j}`,
+              `${fName}0${j}${shortLetter}`, `${fName}${j}${shortLetter}`, `${sideWord}${fName}${j}`
             ]);
             if (jBone) joints.push(jBone);
           }
           fingers[fName] = joints;
         }
-        return { arm, fore, hand, fingers };
+        return { shoulder, arm, fore, hand, fingers };
       }
 
       const rigMap = {
+        hips: findBoneByCandidates(boneList, ['hips', 'pelvis']),
         spine: findBoneByCandidates(boneList, ['spine2', 'spine1', 'spine', 'chest']),
         neck: findBoneByCandidates(boneList, ['neck', 'head']),
         right: mapSide('right', 'r'),
@@ -1054,20 +903,31 @@
 
       scene.add(gltfScene);
       gltfRig = { root: gltfScene, rigMap, restQuats, restChildDirs };
-
       const fingerCount = Object.values(rigMap.right.fingers).reduce((acc, arr) => acc + arr.length, 0) +
                           Object.values(rigMap.left.fingers).reduce((acc, arr) => acc + arr.length, 0);
       document.getElementById('model-info').innerHTML =
-        `Rig: <b>Real Human 3D .GLB</b> (${boneList.length} bones, ${fingerCount} finger joints)`;
+        `Rig: <b>${sourceLabel}</b> (${boneList.length} bones, ${fingerCount} finger joints)`;
     }
 
-    loader.load('./character.glb', (gltf) => bindGLBModel(gltf.scene), undefined, () => {});
+    loader.load(
+      './character/character.gltf',
+      (gltf) => bindGLBModel(gltf.scene, 'Human 3D Avatar (character.gltf)'),
+      undefined,
+      () => {
+        loader.load(
+          './character.glb',
+          (gltf) => bindGLBModel(gltf.scene, 'Human 3D Avatar (character.glb)'),
+          undefined,
+          () => {}
+        );
+      }
+    );
 
     function handleGLBFile(file) {
       if (!file) return;
       const url = URL.createObjectURL(file);
       loader.load(url, (gltf) => {
-        bindGLBModel(gltf.scene);
+        bindGLBModel(gltf.scene, file.name);
         URL.revokeObjectURL(url);
       });
     }
@@ -1075,50 +935,51 @@
     const dropCurtain = document.getElementById('drop-curtain');
     let dragDepth = 0;
     document.getElementById('glb-input').addEventListener('change', (e) => handleGLBFile(e.target.files[0]));
-    window.addEventListener('dragenter', (e) => {
-      e.preventDefault();
-      dragDepth++;
-      dropCurtain.classList.add('visible');
-    });
-    window.addEventListener('dragleave', (e) => {
-      e.preventDefault();
-      dragDepth = Math.max(0, dragDepth - 1);
-      if (dragDepth === 0) dropCurtain.classList.remove('visible');
-    });
+    window.addEventListener('dragenter', (e) => { e.preventDefault(); dragDepth++; dropCurtain.classList.add('visible'); });
+    window.addEventListener('dragleave', (e) => { e.preventDefault(); dragDepth = Math.max(0, dragDepth - 1); if (dragDepth === 0) dropCurtain.classList.remove('visible'); });
     window.addEventListener('dragover', (e) => e.preventDefault());
     window.addEventListener('drop', (e) => {
-      e.preventDefault();
-      dragDepth = 0;
-      dropCurtain.classList.remove('visible');
+      e.preventDefault(); dragDepth = 0; dropCurtain.classList.remove('visible');
       if (e.dataTransfer.files.length) handleGLBFile(e.dataTransfer.files[0]);
     });
 
-    // 5. 3D INVERSE KINEMATICS & FINGER ARTICULATION
-    function computeFingerCurls(hand63) {
+    function analyzeHandLandmarks(hand63, sideSign) {
       const pts = [];
       for (let i = 0; i < 21; i++) {
         pts.push(new THREE.Vector3(hand63[i * 3], -hand63[i * 3 + 1], -hand63[i * 3 + 2]));
       }
+
+      const vIndex = new THREE.Vector3().subVectors(pts[5], pts[0]);
+      const vPinky = new THREE.Vector3().subVectors(pts[17], pts[0]);
+      const vUp = new THREE.Vector3().subVectors(pts[9], pts[0]).normalize();
+      const palmNormal = new THREE.Vector3().crossVectors(vIndex, vPinky).normalize();
+
+      const pitch = THREE.MathUtils.clamp(-0.65 - vUp.y * 0.65, -1.35, 0.25);
+      const yaw = THREE.MathUtils.clamp(palmNormal.x * 1.1 - sideSign * 0.25, -1.4, 1.4);
+      const roll = THREE.MathUtils.clamp(-vUp.x * 0.85, -0.9, 0.9);
+
       function angleBetween(a, b, c) {
         const v1 = new THREE.Vector3().subVectors(a, b).normalize();
         const v2 = new THREE.Vector3().subVectors(c, b).normalize();
         const dot = THREE.MathUtils.clamp(v1.dot(v2), -1, 1);
         return Math.max(0, Math.PI - Math.acos(dot));
       }
-      return {
-        thumb: [angleBetween(pts[0], pts[1], pts[2]) * 0.65, angleBetween(pts[1], pts[2], pts[3]), angleBetween(pts[2], pts[3], pts[4])],
-        index: [angleBetween(pts[0], pts[5], pts[6]) * 0.85, angleBetween(pts[5], pts[6], pts[7]), angleBetween(pts[6], pts[7], pts[8])],
-        middle: [angleBetween(pts[0], pts[9], pts[10]) * 0.85, angleBetween(pts[9], pts[10], pts[11]), angleBetween(pts[10], pts[11], pts[12])],
-        ring: [angleBetween(pts[0], pts[13], pts[14]) * 0.85, angleBetween(pts[13], pts[14], pts[15]), angleBetween(pts[14], pts[15], pts[16])],
-        pinky: [angleBetween(pts[0], pts[17], pts[18]) * 0.85, angleBetween(pts[17], pts[18], pts[19]), angleBetween(pts[18], pts[19], pts[20])],
+
+      const curls = {
+        thumb: [angleBetween(pts[0], pts[1], pts[2]) * 0.75, angleBetween(pts[1], pts[2], pts[3]) * 1.15, angleBetween(pts[2], pts[3], pts[4]) * 1.15],
+        index: [angleBetween(pts[0], pts[5], pts[6]) * 0.95, angleBetween(pts[5], pts[6], pts[7]) * 1.15, angleBetween(pts[6], pts[7], pts[8]) * 1.15],
+        middle: [angleBetween(pts[0], pts[9], pts[10]) * 0.95, angleBetween(pts[9], pts[10], pts[11]) * 1.15, angleBetween(pts[10], pts[11], pts[12]) * 1.15],
+        ring: [angleBetween(pts[0], pts[13], pts[14]) * 0.95, angleBetween(pts[13], pts[14], pts[15]) * 1.15, angleBetween(pts[14], pts[15], pts[16]) * 1.15],
+        pinky: [angleBetween(pts[0], pts[17], pts[18]) * 0.95, angleBetween(pts[17], pts[18], pts[19]) * 1.15, angleBetween(pts[18], pts[19], pts[20]) * 1.15],
       };
+
+      return { curls, wristRot: { x: pitch, y: yaw, z: roll } };
     }
 
     function solve2BoneIKWorld(shoulderPos, targetPos, polePos, L1, L2) {
       const diff = new THREE.Vector3().subVectors(targetPos, shoulderPos);
       const dist = THREE.MathUtils.clamp(diff.length(), Math.abs(L1 - L2) + 0.02, (L1 + L2) - 0.01);
       const dir = diff.clone().normalize();
-
       const cosA = THREE.MathUtils.clamp((L1 * L1 + dist * dist - L2 * L2) / (2 * L1 * dist), -1, 1);
       const angleA = Math.acos(cosA);
 
@@ -1132,53 +993,58 @@
         .addScaledVector(poleDir, L1 * Math.sin(angleA));
     }
 
-    function aimBoneAtWorldPoint(bone, childWorldTarget, boneLocalAxis) {
+    function aimBoneAtWorldPoint(bone, childWorldTarget, boneLocalAxis, smoothFactor = 0.24) {
       if (!bone || !bone.parent) return;
       const boneWorldPos = new THREE.Vector3();
       bone.getWorldPosition(boneWorldPos);
-
       const desiredWorldDir = new THREE.Vector3().subVectors(childWorldTarget, boneWorldPos).normalize();
       const parentWorldQuat = new THREE.Quaternion();
       bone.parent.getWorldQuaternion(parentWorldQuat);
-
       const desiredLocalDir = desiredWorldDir.clone().applyQuaternion(parentWorldQuat.clone().invert()).normalize();
       const targetQuat = new THREE.Quaternion().setFromUnitVectors(boneLocalAxis, desiredLocalDir);
-      bone.quaternion.slerp(targetQuat, 0.28);
+      bone.quaternion.slerp(targetQuat, smoothFactor);
     }
 
-    // 6. MAIN RENDER LOOP
     const clock = new THREE.Clock();
 
     function animate() {
       requestAnimationFrame(animate);
       const t = clock.getElapsedTime();
 
-      ambientParticles.rotation.y = t * 0.04;
-      ringInner.material.opacity = state.isSigning ? 0.65 + Math.sin(t * 4) * 0.15 : 0.35;
+      // Natural organic breathing and subtle posture sway waves
+      const breathWave = Math.sin(t * 1.65);
+      const swayWave = Math.sin(t * 0.72);
+      const microHeadWave = Math.sin(t * 1.15);
+
+      ambientParticles.rotation.y = t * 0.035;
+      ringInner.material.opacity = state.isSigning ? 0.65 + Math.sin(t * 3.2) * 0.15 : 0.35;
 
       if (camTween) {
-        camera.position.lerp(camTween.pos, 0.1);
-        controls.target.lerp(camTween.target, 0.1);
-        if (camera.position.distanceTo(camTween.pos) < 0.005) {
-          camTween = null;
-        }
+        camera.position.lerp(camTween.pos, 0.08);
+        controls.target.lerp(camTween.target, 0.08);
+        if (camera.position.distanceTo(camTween.pos) < 0.005) camTween = null;
       }
 
       const leftActive = state.leftWrist[1] < 0.78;
       const rightActive = state.rightWrist[1] < 0.78;
       const pullX = (leftActive ? state.leftWrist[0] : 0) + (rightActive ? state.rightWrist[0] : 0);
+      const activeHandY = rightActive ? state.rightWrist[1] : (leftActive ? state.leftWrist[1] : 0.3);
 
       if (proceduralRig) {
         const { torso, headPivot, leftArm, rightArm } = proceduralRig;
         const downAxis = new THREE.Vector3(0, -1, 0);
 
-        torso.position.y = 0.95 + Math.sin(t * 2.1) * 0.008;
-        torso.rotation.z = THREE.MathUtils.lerp(torso.rotation.z, -pullX * 0.14 + Math.sin(t * 1.1) * 0.015, 0.12);
-        torso.rotation.y = THREE.MathUtils.lerp(torso.rotation.y, pullX * 0.18, 0.12);
+        torso.position.y = 0.95 + breathWave * 0.007;
+        torso.rotation.z = THREE.MathUtils.lerp(torso.rotation.z, -pullX * 0.12 + swayWave * 0.018, 0.09);
+        torso.rotation.y = THREE.MathUtils.lerp(torso.rotation.y, pullX * 0.16 + Math.cos(t * 0.6) * 0.02, 0.09);
 
-        headPivot.rotation.y = THREE.MathUtils.lerp(headPivot.rotation.y, pullX * 0.24, 0.14);
-        headPivot.rotation.z = THREE.MathUtils.lerp(headPivot.rotation.z, -pullX * 0.10, 0.14);
-        headPivot.rotation.x = THREE.MathUtils.lerp(headPivot.rotation.x, state.isSigning ? Math.sin(t * 3.8) * 0.04 : 0.02, 0.14);
+        headPivot.rotation.y = THREE.MathUtils.lerp(headPivot.rotation.y, pullX * 0.22 + microHeadWave * 0.035, 0.10);
+        headPivot.rotation.z = THREE.MathUtils.lerp(headPivot.rotation.z, -pullX * 0.08 + swayWave * 0.02, 0.10);
+        headPivot.rotation.x = THREE.MathUtils.lerp(
+          headPivot.rotation.x,
+          state.isSigning ? (activeHandY * 0.08 + Math.sin(t * 2.4) * 0.025) : (0.02 + breathWave * 0.015),
+          0.10
+        );
 
         const arms = [
           { rig: leftArm, wrist: state.leftWrist, hand: state.leftHand, side: -1 },
@@ -1190,39 +1056,50 @@
           a.rig.shoulderPivot.getWorldPosition(shWorld);
 
           const isDown = a.wrist[1] >= 0.78;
+          const idleFloatX = a.side * (0.27 + breathWave * 0.006);
+          const idleFloatY = 0.84 + breathWave * 0.010;
           const targetWorld = isDown
-            ? new THREE.Vector3(a.side * 0.27, 0.84, 0.04)
-            : new THREE.Vector3(a.wrist[0] * 0.56, 1.35 - a.wrist[1] * 0.48, 0.30);
+            ? new THREE.Vector3(idleFloatX, idleFloatY, 0.04 + swayWave * 0.01)
+            : new THREE.Vector3(a.wrist[0] * 0.56, 1.35 - a.wrist[1] * 0.48 + breathWave * 0.005, 0.32);
 
-          const poleWorld = new THREE.Vector3(a.side * 0.45, 0.92, -0.08);
+          const poleWorld = new THREE.Vector3(a.side * 0.46, 0.90, -0.08);
           const elbowWorld = solve2BoneIKWorld(shWorld, targetWorld, poleWorld, a.rig.upperLen, a.rig.foreLen);
 
-          aimBoneAtWorldPoint(a.rig.shoulderPivot, elbowWorld, downAxis);
-          aimBoneAtWorldPoint(a.rig.elbowPivot, targetWorld, downAxis);
+          aimBoneAtWorldPoint(a.rig.shoulderPivot, elbowWorld, downAxis, 0.24);
+          aimBoneAtWorldPoint(a.rig.elbowPivot, targetWorld, downAxis, 0.26);
 
-          a.rig.wristPivot.rotation.x = THREE.MathUtils.lerp(a.rig.wristPivot.rotation.x, isDown ? 0.0 : -0.45, 0.22);
-          a.rig.wristPivot.rotation.y = THREE.MathUtils.lerp(a.rig.wristPivot.rotation.y, isDown ? 0.0 : -a.side * 0.35, 0.22);
+          const { curls, wristRot } = analyzeHandLandmarks(a.hand, a.side);
+          a.rig.wristPivot.rotation.x = THREE.MathUtils.lerp(a.rig.wristPivot.rotation.x, isDown ? 0.0 : wristRot.x, 0.22);
+          a.rig.wristPivot.rotation.y = THREE.MathUtils.lerp(a.rig.wristPivot.rotation.y, isDown ? 0.0 : wristRot.y, 0.22);
+          a.rig.wristPivot.rotation.z = THREE.MathUtils.lerp(a.rig.wristPivot.rotation.z, isDown ? 0.0 : wristRot.z, 0.22);
 
-          const curls = computeFingerCurls(a.hand);
+          const idleCurl = 0.16 + breathWave * 0.03;
           for (const [fname, joints] of Object.entries(a.rig.fingers)) {
             const c = curls[fname];
             for (let k = 0; k < 3; k++) {
-              joints[k].rotation.x = THREE.MathUtils.lerp(joints[k].rotation.x, -c[k], 0.3);
+              const targetAngle = isDown ? -idleCurl : -c[k];
+              joints[k].rotation.x = THREE.MathUtils.lerp(joints[k].rotation.x, targetAngle, 0.30);
             }
           }
         }
       } else if (gltfRig) {
         const { rigMap, restQuats, restChildDirs } = gltfRig;
 
+        // Subtle natural breathing in chest/spine and relaxed posture sway
         if (rigMap.spine && restQuats.has(rigMap.spine)) {
-          const qTilt = new THREE.Quaternion().setFromEuler(new THREE.Euler(0, pullX * 0.14, -pullX * 0.08));
-          rigMap.spine.quaternion.slerp(restQuats.get(rigMap.spine).clone().multiply(qTilt), 0.15);
-        }
-        if (rigMap.neck && restQuats.has(rigMap.neck)) {
-          const qLook = new THREE.Quaternion().setFromEuler(
-            new THREE.Euler(state.isSigning ? Math.sin(t * 3.8) * 0.04 : 0, pullX * 0.20, 0)
+          const qBreath = new THREE.Quaternion().setFromEuler(
+            new THREE.Euler(breathWave * 0.022, pullX * 0.14 + swayWave * 0.025, -pullX * 0.07 + swayWave * 0.015)
           );
-          rigMap.neck.quaternion.slerp(restQuats.get(rigMap.neck).clone().multiply(qLook), 0.15);
+          rigMap.spine.quaternion.slerp(restQuats.get(rigMap.spine).clone().multiply(qBreath), 0.10);
+        }
+
+        // Natural head orientation: looks subtly toward active signing hand with micro-motion
+        if (rigMap.neck && restQuats.has(rigMap.neck)) {
+          const lookPitch = state.isSigning ? (activeHandY * 0.08 + Math.sin(t * 2.2) * 0.022) : (breathWave * 0.018);
+          const lookYaw = pullX * 0.22 + microHeadWave * 0.04;
+          const lookRoll = -pullX * 0.05 + swayWave * 0.018;
+          const qLook = new THREE.Quaternion().setFromEuler(new THREE.Euler(lookPitch, lookYaw, lookRoll));
+          rigMap.neck.quaternion.slerp(restQuats.get(rigMap.neck).clone().multiply(qLook), 0.10);
         }
 
         const sides = [
@@ -1231,45 +1108,56 @@
         ];
 
         for (const s of sides) {
-          const { arm, fore, hand, fingers } = s.map;
+          const { shoulder, arm, fore, hand, fingers } = s.map;
           if (!arm || !fore || !hand) continue;
 
-          const pSh = new THREE.Vector3();
-          const pEl = new THREE.Vector3();
-          const pWr = new THREE.Vector3();
-          arm.getWorldPosition(pSh);
-          fore.getWorldPosition(pEl);
-          hand.getWorldPosition(pWr);
+          const isDown = s.wrist[1] >= 0.78;
+
+          // Natural clavicle/shoulder lift when arm rises
+          if (shoulder && restQuats.has(shoulder)) {
+            const liftAmount = isDown ? (breathWave * 0.015) : THREE.MathUtils.clamp((0.4 - s.wrist[1]) * 0.14, -0.02, 0.12);
+            const qClav = new THREE.Quaternion().setFromEuler(new THREE.Euler(0, 0, -s.side * liftAmount));
+            shoulder.quaternion.slerp(restQuats.get(shoulder).clone().multiply(qClav), 0.12);
+          }
+
+          const pSh = new THREE.Vector3(), pEl = new THREE.Vector3(), pWr = new THREE.Vector3();
+          arm.getWorldPosition(pSh); fore.getWorldPosition(pEl); hand.getWorldPosition(pWr);
 
           const L1 = Math.max(0.14, pSh.distanceTo(pEl));
           const L2 = Math.max(0.14, pEl.distanceTo(pWr));
-          const isDown = s.wrist[1] >= 0.78;
 
           const targetWorld = isDown
-            ? new THREE.Vector3(pSh.x + s.side * 0.05, pSh.y - (L1 + L2) * 0.94, pSh.z + 0.04)
-            : new THREE.Vector3(s.wrist[0] * 0.54, pSh.y - s.wrist[1] * 0.46, pSh.z + 0.30);
+            ? new THREE.Vector3(
+                pSh.x + s.side * (0.05 + breathWave * 0.008),
+                pSh.y - (L1 + L2) * 0.94 + breathWave * 0.008,
+                pSh.z + 0.04 + swayWave * 0.01
+              )
+            : new THREE.Vector3(s.wrist[0] * 0.54, pSh.y - s.wrist[1] * 0.46 + breathWave * 0.005, pSh.z + 0.32);
 
           const poleWorld = new THREE.Vector3(pSh.x + s.side * 0.35, pSh.y - 0.36, pSh.z - 0.12);
           const elbowWorld = solve2BoneIKWorld(pSh, targetWorld, poleWorld, L1, L2);
 
-          aimBoneAtWorldPoint(arm, elbowWorld, restChildDirs.get(arm));
-          aimBoneAtWorldPoint(fore, targetWorld, restChildDirs.get(fore));
+          aimBoneAtWorldPoint(arm, elbowWorld, restChildDirs.get(arm), 0.22);
+          aimBoneAtWorldPoint(fore, targetWorld, restChildDirs.get(fore), 0.25);
 
+          const { curls, wristRot } = analyzeHandLandmarks(s.hand63, s.side);
           if (restQuats.has(hand)) {
             const wristEuler = isDown
-              ? new THREE.Euler(0, 0, 0)
-              : new THREE.Euler(-0.22, -s.side * 0.25, 0);
+              ? new THREE.Euler(0.04 + breathWave * 0.02, 0, 0)
+              : new THREE.Euler(wristRot.x * 0.45, wristRot.y * 0.5, wristRot.z * 0.4);
             const targetHandQ = restQuats.get(hand).clone().multiply(new THREE.Quaternion().setFromEuler(wristEuler));
             hand.quaternion.slerp(targetHandQ, 0.22);
           }
 
-          const curls = computeFingerCurls(s.hand63);
+          // Relaxed natural finger curl when hand is resting by his side
+          const idleCurl = 0.18 + breathWave * 0.03;
           for (const [fName, joints] of Object.entries(fingers)) {
             for (let j = 0; j < joints.length; j++) {
               const bone = joints[j];
               if (bone && restQuats.has(bone)) {
-                const qCurl = new THREE.Quaternion().setFromEuler(new THREE.Euler(curls[fName][j], 0, 0));
-                bone.quaternion.slerp(restQuats.get(bone).clone().multiply(qCurl), 0.3);
+                const curlVal = isDown ? idleCurl : curls[fName][j];
+                const qCurl = new THREE.Quaternion().setFromEuler(new THREE.Euler(curlVal, 0, 0));
+                bone.quaternion.slerp(restQuats.get(bone).clone().multiply(qCurl), 0.30);
               }
             }
           }
@@ -1281,7 +1169,7 @@
     }
     animate();
 
-    // 7. UNIFIED WEBSOCKET SYNC
+    // WEBSOCKET SYNC
     let socket = null;
     let renderedVocabKey = '';
     let renderedGlossKey = '';
@@ -1322,7 +1210,6 @@
         performingWord.textContent = data.label;
         statusText.textContent = data.status;
 
-        // Render clickable quick-sign pills only when vocabulary changes
         if (Array.isArray(data.available_signs)) {
           const key = data.available_signs.join(',');
           if (key !== renderedVocabKey) {
@@ -1340,9 +1227,7 @@
           }
         }
 
-        if (data.cam_frame) {
-          camFeed.src = 'data:image/jpeg;base64,' + data.cam_frame;
-        }
+        if (data.cam_frame) camFeed.src = 'data:image/jpeg;base64,' + data.cam_frame;
         const isDetected = data.live_label && !['No Hand', 'Neutral / Resting', 'Starting Camera...'].includes(data.live_label);
         camStatusPill.textContent = `Detected: ${data.live_label} (${data.confidence}%)`;
         camStatusPill.classList.toggle('active', isDetected);
@@ -1352,7 +1237,6 @@
         btnVoice.textContent = data.is_listening ? 'Listening (4s)...' : 'Voice Mic [V]';
         btnVoice.classList.toggle('listening', Boolean(data.is_listening));
 
-        // Update Gloss Stream DOM only when glosses actually change (prevents flickering)
         const glossKey = Array.isArray(data.glosses) ? data.glosses.join('|') : '';
         if (glossKey !== renderedGlossKey) {
           renderedGlossKey = glossKey;
@@ -1383,14 +1267,10 @@
     }
     connectWS();
 
-    // UI & Keyboard Controls
     const phraseInput = document.getElementById('phrase-input');
     function sendPhrase() {
       const txt = phraseInput.value.trim();
-      if (txt) {
-        sendAction({ action: 'enqueue', text: txt });
-        phraseInput.value = '';
-      }
+      if (txt) { sendAction({ action: 'enqueue', text: txt }); phraseInput.value = ''; }
     }
     document.getElementById('send-btn').addEventListener('click', sendPhrase);
     phraseInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') sendPhrase(); });
@@ -1401,26 +1281,15 @@
     document.getElementById('btn-dots').addEventListener('click', () => sendAction({ action: 'toggle_dots' }));
     document.getElementById('btn-voice').addEventListener('click', () => sendAction({ action: 'voice' }));
 
-    document.getElementById('cam-upper').addEventListener('click', () => {
-      flyCameraTo([0, 1.44, 2.22], [0, 1.35, 0]);
-    });
-    document.getElementById('cam-hands').addEventListener('click', () => {
-      flyCameraTo([0, 1.28, 1.12], [0, 1.22, 0.22]);
-    });
-    document.getElementById('cam-reset').addEventListener('click', () => {
-      flyCameraTo([0, 1.44, 2.22], [0, 1.35, 0]);
-    });
+    document.getElementById('cam-upper').addEventListener('click', () => flyCameraTo([0, 1.44, 2.22], [0, 1.35, 0]));
+    document.getElementById('cam-hands').addEventListener('click', () => flyCameraTo([0, 1.28, 1.12], [0, 1.22, 0.22]));
+    document.getElementById('cam-reset').addEventListener('click', () => flyCameraTo([0, 1.44, 2.22], [0, 1.35, 0]));
 
     window.addEventListener('keydown', (e) => {
       if (document.activeElement && document.activeElement.tagName === 'INPUT') return;
-      if (e.code === 'Space') {
-        e.preventDefault();
-        sendAction({ action: 'speak' });
-      } else if (e.key === 'v' || e.key === 'V') {
-        sendAction({ action: 'voice' });
-      } else if (e.key === 'Backspace') {
-        sendAction({ action: 'undo' });
-      }
+      if (e.code === 'Space') { e.preventDefault(); sendAction({ action: 'speak' }); }
+      else if (e.key === 'v' || e.key === 'V') { sendAction({ action: 'voice' }); }
+      else if (e.key === 'Backspace') { sendAction({ action: 'undo' }); }
     });
   </script>
 </body>
