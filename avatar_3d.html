@@ -3,23 +3,23 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>AuraSign — Two-Way AI Sign Language Studio</title>
+  <title>AuraSign Studio — Two-Way Bangla Sign Interpreter</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet">
   <style>
     :root {
       --bg-base: #06080d;
-      --bg-panel: rgba(13, 18, 28, 0.74);
-      --bg-card: rgba(18, 24, 38, 0.78);
-      --border-subtle: rgba(255, 255, 255, 0.08);
+      --bg-card: rgba(18, 24, 38, 0.82);
+      --border-subtle: rgba(255, 255, 255, 0.09);
       --text-primary: #f1f5f9;
       --text-secondary: #94a3b8;
       --text-muted: #64748b;
       --accent-emerald-bright: #34d399;
       --accent-cyan-bright: #38bdf8;
-      --font-sans: 'Plus Jakarta Sans', 'Segoe UI', system-ui, -apple-system, sans-serif;
-      --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, monospace;
+      --font-ui: 'Inter', 'Hind Siliguri', system-ui, sans-serif;
+      --font-bn: 'Hind Siliguri', 'Nirmala UI', sans-serif;
+      --font-mono: 'JetBrains Mono', ui-monospace, monospace;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -27,7 +27,7 @@
     body {
       background: var(--bg-base);
       color: var(--text-primary);
-      font-family: var(--font-sans);
+      font-family: var(--font-ui);
       overflow: hidden;
       height: 100vh;
       width: 100vw;
@@ -45,7 +45,7 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      background: rgba(9, 12, 19, 0.85);
+      background: rgba(9, 12, 19, 0.88);
       backdrop-filter: blur(16px);
       border-bottom: 1px solid var(--border-subtle);
       z-index: 20;
@@ -55,37 +55,35 @@
     .brand { display: flex; align-items: center; gap: 12px; }
 
     .brand-logo {
-      width: 32px;
-      height: 32px;
+      width: 30px;
+      height: 30px;
       border-radius: 9px;
       background: linear-gradient(135deg, #10b981 0%, #0ea5e9 55%, #6366f1 100%);
       display: grid;
       place-items: center;
       box-shadow: 0 0 20px rgba(56, 189, 248, 0.35);
       font-weight: 800;
-      font-size: 0.95rem;
+      font-size: 0.92rem;
       color: #fff;
     }
 
     .brand-name {
       font-size: 1.05rem;
       font-weight: 800;
-      letter-spacing: -0.3px;
+      letter-spacing: -0.02em;
       background: linear-gradient(90deg, #f8fafc 0%, #bae6fd 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
     }
 
     .brand-tag {
-      font-family: var(--font-mono);
-      font-size: 0.68rem;
+      font-size: 0.72rem;
       font-weight: 600;
       padding: 3px 9px;
       border-radius: 999px;
       background: rgba(56, 189, 248, 0.12);
       border: 1px solid rgba(56, 189, 248, 0.28);
       color: var(--accent-cyan-bright);
-      letter-spacing: 0.4px;
     }
 
     .topbar-right { display: flex; align-items: center; gap: 10px; }
@@ -94,22 +92,19 @@
       display: inline-flex;
       align-items: center;
       gap: 8px;
-      font-family: var(--font-mono);
-      font-size: 0.72rem;
+      font-size: 0.75rem;
       font-weight: 600;
-      padding: 6px 12px;
+      padding: 5px 12px;
       border-radius: 999px;
       background: rgba(239, 68, 68, 0.12);
       color: #fca5a5;
       border: 1px solid rgba(239, 68, 68, 0.32);
-      transition: all 0.25s ease;
     }
 
     .badge.connected {
       background: rgba(16, 185, 129, 0.12);
       color: var(--accent-emerald-bright);
       border-color: rgba(52, 211, 153, 0.35);
-      box-shadow: 0 0 16px rgba(16, 185, 129, 0.15);
     }
 
     .dot {
@@ -140,20 +135,18 @@
       background: linear-gradient(180deg, rgba(13, 18, 29, 0.82) 0%, rgba(9, 13, 21, 0.92) 100%);
       border-right: 1px solid var(--border-subtle);
       padding: 16px 20px 18px;
-      gap: 14px;
+      gap: 12px;
       min-height: 0;
-      position: relative;
     }
 
-    .pane-header { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+    .pane-header { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
 
     .step-pill {
       display: inline-flex;
       align-items: center;
       gap: 8px;
-      font-size: 0.86rem;
+      font-size: 0.90rem;
       font-weight: 700;
-      letter-spacing: 0.3px;
       color: var(--accent-emerald-bright);
     }
 
@@ -173,7 +166,7 @@
       border-color: rgba(56, 189, 248, 0.35);
     }
 
-    .pane-sub { font-size: 0.79rem; color: var(--text-secondary); margin-top: 3px; }
+    .pane-sub { font-size: 0.79rem; color: var(--text-secondary); margin-top: 2px; }
 
     .cam-wrapper {
       position: relative;
@@ -186,27 +179,12 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      box-shadow: inset 0 0 40px rgba(0, 0, 0, 0.65), 0 14px 34px rgba(0, 0, 0, 0.45);
-      transition: border-color 0.25s ease, box-shadow 0.25s ease;
     }
 
     .cam-wrapper.active-sign {
-      border-color: rgba(52, 211, 153, 0.45);
-      box-shadow: inset 0 0 30px rgba(16, 185, 129, 0.08), 0 0 28px rgba(16, 185, 129, 0.14);
-    }
-
-    .cam-wrapper::before, .cam-wrapper::after {
-      content: "";
-      position: absolute;
-      width: 22px;
-      height: 22px;
-      pointer-events: none;
-      z-index: 4;
       border-color: rgba(52, 211, 153, 0.55);
-      border-style: solid;
+      box-shadow: 0 0 28px rgba(16, 185, 129, 0.18);
     }
-    .cam-wrapper::before { top: 12px; right: 12px; border-width: 2px 2px 0 0; border-top-right-radius: 6px; }
-    .cam-wrapper::after { bottom: 12px; left: 12px; border-width: 0 0 2px 2px; border-bottom-left-radius: 6px; }
 
     #cam-feed { width: 100%; height: 100%; object-fit: cover; display: block; }
 
@@ -215,85 +193,122 @@
       top: 14px;
       left: 14px;
       z-index: 5;
-      background: rgba(8, 12, 20, 0.78);
+      background: rgba(8, 12, 20, 0.82);
       backdrop-filter: blur(12px);
-      border: 1px solid rgba(255, 255, 255, 0.12);
+      border: 1px solid rgba(255, 255, 255, 0.14);
       padding: 6px 14px;
       border-radius: 999px;
-      font-family: var(--font-mono);
-      font-size: 0.76rem;
+      font-size: 0.84rem;
       font-weight: 600;
+      font-family: var(--font-bn);
       color: var(--text-primary);
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      transition: all 0.2s ease;
     }
 
     .cam-overlay-pill.active {
-      background: rgba(6, 40, 28, 0.85);
+      background: rgba(6, 40, 28, 0.9);
       border-color: rgba(52, 211, 153, 0.55);
       color: var(--accent-emerald-bright);
-      box-shadow: 0 0 18px rgba(16, 185, 129, 0.25);
     }
 
+    /* ZERO-RETRAIN ADD SIGN DRAWER */
+    .drawer-card {
+      background: rgba(12, 22, 36, 0.94);
+      border: 1px solid rgba(56, 189, 248, 0.35);
+      border-radius: 14px;
+      padding: 12px 15px;
+      display: none;
+      flex-direction: column;
+      gap: 9px;
+    }
+
+    .drawer-card.open { display: flex; }
+
+    .drawer-title {
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: var(--accent-cyan-bright);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .custom-chip-list {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .custom-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(56, 189, 248, 0.14);
+      border: 1px solid rgba(56, 189, 248, 0.35);
+      color: #e0f2fe;
+      border-radius: 999px;
+      padding: 2px 9px;
+      font-size: 0.80rem;
+      font-family: var(--font-bn);
+    }
+
+    .custom-chip button {
+      background: transparent;
+      border: none;
+      color: #fca5a5;
+      padding: 0 2px;
+      font-size: 0.80rem;
+      cursor: pointer;
+    }
+
+    /* BANGLA OUTPUT & CONTROLS ZONE */
     .output-card {
       background: var(--bg-card);
       backdrop-filter: blur(16px);
       border: 1px solid var(--border-subtle);
       border-radius: 16px;
-      padding: 15px 18px;
+      padding: 14px 17px;
       display: flex;
       flex-direction: column;
-      gap: 11px;
-      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.35);
+      gap: 10px;
+      font-family: var(--font-bn);
     }
 
-    .gloss-row { display: flex; align-items: center; gap: 7px; flex-wrap: wrap; min-height: 28px; }
+    .gloss-row { display: flex; align-items: center; gap: 7px; flex-wrap: wrap; min-height: 26px; }
 
     .gloss-label {
-      font-family: var(--font-mono);
-      font-size: 0.70rem;
-      text-transform: uppercase;
-      letter-spacing: 0.8px;
+      font-size: 0.84rem;
+      font-weight: 600;
       color: var(--text-secondary);
       margin-right: 4px;
     }
 
     .gloss-chip {
-      background: linear-gradient(135deg, rgba(14, 165, 233, 0.18), rgba(99, 102, 241, 0.18));
-      border: 1px solid rgba(56, 189, 248, 0.38);
+      background: linear-gradient(135deg, rgba(14, 165, 233, 0.2), rgba(99, 102, 241, 0.2));
+      border: 1px solid rgba(56, 189, 248, 0.42);
       color: #bae6fd;
-      padding: 3px 10px;
+      padding: 3px 11px;
       border-radius: 999px;
-      font-family: var(--font-mono);
-      font-size: 0.73rem;
+      font-size: 0.88rem;
       font-weight: 600;
-      animation: chipPop 0.22s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
-    .gloss-arrow { color: var(--text-muted); font-size: 0.75rem; }
-
-    @keyframes chipPop {
-      from { opacity: 0; transform: scale(0.85) translateY(3px); }
-      to { opacity: 1; transform: scale(1) translateY(0); }
-    }
+    .gloss-arrow { color: var(--text-muted); font-size: 0.82rem; }
 
     .sentence-box {
       background: rgba(6, 9, 15, 0.85);
-      border: 1px solid rgba(56, 189, 248, 0.16);
+      border: 1px solid rgba(56, 189, 248, 0.18);
       border-radius: 12px;
-      padding: 12px 15px;
-      font-size: 1.12rem;
+      padding: 11px 14px;
+      font-size: 1.25rem;
       font-weight: 700;
       color: #e0f2fe;
       min-height: 48px;
       display: flex;
       align-items: center;
-      box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.45);
     }
 
-    .sentence-box.empty { color: var(--text-muted); font-weight: 500; font-size: 0.94rem; }
+    .sentence-box.empty { color: var(--text-muted); font-weight: 500; font-size: 0.96rem; }
 
     .right-pane { position: relative; height: 100%; width: 100%; overflow: hidden; background: #070a10; }
     #three-stage { position: absolute; inset: 0; z-index: 1; }
@@ -303,10 +318,6 @@
       top: 16px;
       left: 18px;
       right: 18px;
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      gap: 12px;
       z-index: 10;
       pointer-events: none;
     }
@@ -321,7 +332,7 @@
     }
 
     .glass-card {
-      background: rgba(13, 18, 29, 0.76);
+      background: rgba(13, 18, 29, 0.80);
       backdrop-filter: blur(18px);
       border: 1px solid rgba(255, 255, 255, 0.1);
       border-radius: 16px;
@@ -329,6 +340,8 @@
       pointer-events: auto;
       box-shadow: 0 14px 36px rgba(0, 0, 0, 0.5);
     }
+
+    .bn-zone { font-family: var(--font-bn); }
 
     .performing-header {
       display: flex;
@@ -338,28 +351,20 @@
       margin-bottom: 11px;
     }
 
-    .performing-label {
-      font-family: var(--font-mono);
-      font-size: 0.68rem;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      color: var(--text-secondary);
-    }
+    .performing-label { font-size: 0.82rem; color: var(--text-secondary); }
 
     .performing-word {
-      font-size: 1.48rem;
-      font-weight: 800;
-      letter-spacing: -0.3px;
+      font-size: 1.65rem;
+      font-weight: 700;
       background: linear-gradient(90deg, #34d399 0%, #38bdf8 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
-      margin-top: 2px;
     }
 
     .vocab-strip {
       display: flex;
       align-items: center;
-      gap: 6px;
+      gap: 7px;
       flex-wrap: wrap;
       margin-bottom: 11px;
       padding-bottom: 10px;
@@ -367,20 +372,19 @@
     }
 
     .vocab-tag {
-      font-family: var(--font-mono);
-      font-size: 0.69rem;
+      font-size: 0.88rem;
       font-weight: 600;
-      padding: 4px 9px;
-      border-radius: 7px;
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      color: #cbd5e1;
+      padding: 4px 11px;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      color: #e2e8f0;
       cursor: pointer;
       transition: all 0.15s ease;
     }
 
     .vocab-tag:hover {
-      background: rgba(56, 189, 248, 0.18);
+      background: rgba(56, 189, 248, 0.22);
       border-color: var(--accent-cyan-bright);
       color: #fff;
       transform: translateY(-1px);
@@ -388,31 +392,30 @@
 
     .controls-row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
 
-    input[type="text"] {
+    input[type="text"], select {
       background: rgba(6, 9, 15, 0.88);
       border: 1px solid rgba(255, 255, 255, 0.14);
       color: #f8fafc;
-      font-family: var(--font-sans);
-      padding: 9px 13px;
+      font-family: var(--font-bn);
+      padding: 8px 12px;
       border-radius: 10px;
-      font-size: 0.86rem;
-      flex: 1;
-      min-width: 160px;
+      font-size: 0.92rem;
       outline: none;
-      transition: border-color 0.2s ease, box-shadow 0.2s ease;
     }
 
-    input[type="text"]:focus {
+    input[type="text"] { flex: 1; min-width: 150px; }
+
+    input[type="text"]:focus, select:focus {
       border-color: var(--accent-cyan-bright);
       box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.15);
     }
 
     button, label.btn {
-      background: rgba(30, 41, 59, 0.85);
+      background: rgba(30, 41, 59, 0.88);
       color: #e2e8f0;
       border: 1px solid rgba(255, 255, 255, 0.12);
-      font-family: var(--font-sans);
-      padding: 8px 13px;
+      font-family: var(--font-ui);
+      padding: 8px 12px;
       border-radius: 10px;
       font-size: 0.80rem;
       font-weight: 600;
@@ -422,6 +425,11 @@
       display: inline-flex;
       align-items: center;
       gap: 6px;
+    }
+
+    .bn-btn {
+      font-family: var(--font-bn);
+      font-size: 0.90rem;
     }
 
     button:hover, label.btn:hover {
@@ -434,43 +442,29 @@
       background: linear-gradient(135deg, #0284c7 0%, #2563eb 100%);
       border-color: rgba(56, 189, 248, 0.55);
       color: #fff;
-      box-shadow: 0 4px 16px rgba(2, 132, 199, 0.3);
     }
 
     button.success {
       background: linear-gradient(135deg, #059669 0%, #0d9488 100%);
       border-color: rgba(52, 211, 153, 0.55);
       color: #fff;
-      box-shadow: 0 4px 16px rgba(5, 150, 105, 0.28);
+    }
+
+    button.accent-outline {
+      background: rgba(14, 165, 233, 0.14);
+      border-color: rgba(56, 189, 248, 0.45);
+      color: #7dd3fc;
     }
 
     button.listening {
       background: linear-gradient(135deg, #dc2626 0%, #e11d48 100%);
       border-color: #fda4af;
       color: #fff;
-      box-shadow: 0 0 20px rgba(225, 29, 72, 0.45);
     }
 
     #glb-input { display: none; }
-    .drop-hint { font-size: 0.74rem; color: var(--text-secondary); margin-top: 6px; }
-    .drop-hint b { color: var(--accent-cyan-bright); font-weight: 600; }
-
-    .drop-curtain {
-      position: fixed;
-      inset: 0;
-      background: rgba(6, 10, 18, 0.86);
-      backdrop-filter: blur(12px);
-      z-index: 100;
-      display: none;
-      place-items: center;
-      border: 2px dashed var(--accent-cyan-bright);
-      margin: 14px;
-      border-radius: 20px;
-      pointer-events: none;
-    }
-
-    .drop-curtain.visible { display: grid; }
-    .drop-curtain-text { font-size: 1.35rem; font-weight: 700; color: var(--accent-cyan-bright); text-align: center; }
+    .drop-hint { font-size: 0.76rem; color: var(--text-secondary); margin-top: 4px; }
+    .drop-hint b { color: var(--accent-cyan-bright); }
   </style>
   <script type="importmap">
     {
@@ -482,20 +476,17 @@
   </script>
 </head>
 <body>
-  <div class="drop-curtain" id="drop-curtain">
-    <div class="drop-curtain-text">Drop 3D Human Model (.GLB / .GLTF) to Rig &amp; Animate</div>
-  </div>
-
   <header class="topbar">
     <div class="brand">
       <div class="brand-logo">AS</div>
       <span class="brand-name">AuraSign Studio</span>
-      <span class="brand-tag">TWO-WAY AI INTERPRETER</span>
+      <span class="brand-tag">Two-Way Bangla Sign Interpreter</span>
     </div>
     <div class="topbar-right">
-      <label class="btn" for="glb-input">Load Human .GLB</label>
+      <button class="accent-outline" id="btn-toggle-custom">+ Add Medical / Regional Sign</button>
+      <label class="btn" for="glb-input">Load 3D Avatar (.GLB)</label>
       <input type="file" id="glb-input" accept=".glb,.gltf" />
-      <div class="badge" id="ws-badge"><span class="dot"></span><span id="ws-text">OFFLINE</span></div>
+      <div class="badge" id="ws-badge"><span class="dot"></span><span id="ws-text">Disconnected</span></div>
     </div>
   </header>
 
@@ -503,31 +494,52 @@
     <section class="left-pane">
       <div class="pane-header">
         <div>
-          <div class="step-pill"><span class="step-num">01</span> SIGN &rarr; TEXT &amp; SPEECH</div>
-          <div class="pane-sub">Hold a sign steady in front of the camera to construct a sentence</div>
+          <div class="step-pill"><span class="step-num">01</span> Sign Gesture &rarr; Bangla Text &amp; Speech</div>
+          <div class="pane-sub">Perform signs in front of the webcam or enroll new domain signs (5s capture)</div>
         </div>
         <button id="btn-dots">Skeleton: ON</button>
       </div>
 
+      <!-- ZERO-RETRAIN 5-SECOND LIVE SIGN RECORDER DRAWER -->
+      <div class="drawer-card" id="custom-drawer">
+        <div class="drawer-title">
+          <span>Zero-Retrain 5-Second Sign Enrollment (Instant Avatar + Recogniser Update)</span>
+          <span id="capture-status-badge" style="color:#94a3b8; font-weight:600;">5.0s live capture</span>
+        </div>
+        <div class="controls-row">
+          <select id="custom-category" style="font-family: var(--font-ui); font-size:0.82rem;">
+            <option value="Medical">Medical (চিকিৎসা)</option>
+            <option value="Regional">Regional (আঞ্চলিক)</option>
+            <option value="Emergency">Emergency (জরুরি)</option>
+          </select>
+          <input type="text" id="custom-sign-label" placeholder="বাংলায় ইশারার নাম লিখুন (যেমন: ব্যথা / জ্বর / পানি)..." />
+          <button class="primary" id="btn-record-live">Record Live (5s)</button>
+        </div>
+        <div class="custom-chip-list" id="custom-chip-list">
+          <span style="font-size:0.76rem; color:var(--text-muted);">Enrolled Zero-Retrain Signs: None yet</span>
+        </div>
+      </div>
+
       <div class="cam-wrapper" id="cam-wrapper">
-        <img id="cam-feed" alt="Live Webcam Feed" />
+        <img id="cam-feed" alt="Live webcam feed" />
         <div class="cam-overlay-pill" id="cam-status-pill">Status: Waiting for camera...</div>
       </div>
 
+      <!-- BANGLA OUTPUT & BUTTONS -->
       <div class="output-card">
         <div class="gloss-row" id="gloss-container">
-          <span class="gloss-label">Gloss Stream</span>
-          <span style="color:var(--text-muted); font-size:0.80rem;">(Waiting for signs...)</span>
+          <span class="gloss-label">শনাক্তকৃত শব্দসমূহ:</span>
+          <span style="color:var(--text-muted); font-size:0.86rem;">(ইশারার জন্য অপেক্ষা করা হচ্ছে...)</span>
         </div>
 
         <div class="sentence-box empty" id="sentence-box">
-          Your constructed sentence will appear here...
+          আপনার তৈরি করা বাংলা বাক্য এখানে দেখা যাবে...
         </div>
 
         <div class="controls-row">
-          <button class="success" id="btn-speak">Speak Aloud [Space]</button>
-          <button id="btn-undo">Undo [Bksp]</button>
-          <button id="btn-clear">Clear</button>
+          <button class="success bn-btn" id="btn-speak">বাংলায় বলুন [Space]</button>
+          <button class="bn-btn" id="btn-undo">পিছনে যান [Bksp]</button>
+          <button class="bn-btn" id="btn-clear">মুছে ফেলুন</button>
         </div>
       </div>
     </section>
@@ -536,35 +548,36 @@
       <div id="three-stage"></div>
 
       <div class="hud-top-right">
-        <div class="glass-card" style="max-width: 100%;">
-          <div class="step-pill blue"><span class="step-num">02</span> SPEECH / TEXT &rarr; 3D SIGN AVATAR</div>
-          <div class="pane-sub" id="status-text">Connecting to Python engine...</div>
-          <div class="drop-hint" id="model-info">Rig: Studio 3D Rig (Loading <b>character.gltf</b> or drag &amp; drop <b>.glb</b>)</div>
+        <div class="glass-card">
+          <div class="step-pill blue"><span class="step-num">02</span> Bangla Voice / Text &rarr; 3D Sign Avatar</div>
+          <div class="pane-sub" id="status-text" style="font-family: var(--font-bn);">Connecting to Python engine...</div>
+          <div class="drop-hint" id="model-info">Avatar Rig: <b>Loading character.gltf...</b></div>
         </div>
       </div>
 
+      <!-- BANGLA AVATAR PERFORMING & INPUT ZONE -->
       <div class="hud-bottom-right">
-        <div class="glass-card">
+        <div class="glass-card bn-zone">
           <div class="performing-header">
             <div>
-              <div class="performing-label">Performing Gesture</div>
-              <div class="performing-word" id="performing-word">IDLE / LISTENING</div>
+              <div class="performing-label">বর্তমান ইশারা</div>
+              <div class="performing-word" id="performing-word">অপেক্ষমাণ / শুনছি</div>
             </div>
             <div class="controls-row">
-              <button id="cam-upper">Upper Body</button>
-              <button id="cam-hands">Hands Close-Up</button>
+              <button id="cam-upper">Full Body</button>
+              <button id="cam-hands">Close-Up Hands</button>
               <button id="cam-reset">Reset View</button>
             </div>
           </div>
 
           <div class="vocab-strip" id="vocab-strip">
-            <span class="gloss-label">Quick Sign:</span>
+            <span class="gloss-label">দ্রুত ইশারা:</span>
           </div>
 
           <div class="controls-row">
-            <button class="primary" id="btn-voice">Voice Mic [V]</button>
-            <input type="text" id="phrase-input" placeholder="Type words or phrase for 3D avatar to sign..." />
-            <button class="primary" id="send-btn">Sign Phrase</button>
+            <button class="primary bn-btn" id="btn-voice">বাংলা ভয়েস [V]</button>
+            <input type="text" id="phrase-input" placeholder="৩ডি অবতারকে দেখানোর জন্য বাংলায় শব্দ বা বাক্য লিখুন..." />
+            <button class="primary bn-btn" id="send-btn">ইশারা দেখান</button>
           </div>
         </div>
       </div>
@@ -610,38 +623,28 @@
 
     let camTween = null;
     controls.addEventListener('start', () => { camTween = null; });
-
     function flyCameraTo(pos, target) {
       camTween = { pos: new THREE.Vector3(...pos), target: new THREE.Vector3(...target) };
     }
 
-    const resizeObserver = new ResizeObserver(() => {
-      const w = stage.clientWidth;
-      const h = stage.clientHeight;
+    new ResizeObserver(() => {
+      const w = stage.clientWidth, h = stage.clientHeight;
       if (w > 0 && h > 0) {
         camera.aspect = w / h;
         camera.updateProjectionMatrix();
         renderer.setSize(w, h);
       }
-    });
-    resizeObserver.observe(stage);
+    }).observe(stage);
 
     scene.add(new THREE.HemisphereLight(0xf8fafc, 0x1e293b, 0.85));
-
     const keyLight = new THREE.DirectionalLight(0xfff7ed, 1.9);
     keyLight.position.set(1.6, 3.0, 2.6);
     keyLight.castShadow = true;
-    keyLight.shadow.mapSize.set(1024, 1024);
-    keyLight.shadow.bias = -0.0005;
     scene.add(keyLight);
 
     const rimLight = new THREE.DirectionalLight(0x38bdf8, 1.15);
     rimLight.position.set(-2.1, 2.3, -1.8);
     scene.add(rimLight);
-
-    const fillLight = new THREE.DirectionalLight(0x34d399, 0.45);
-    fillLight.position.set(2.0, 1.4, -1.4);
-    scene.add(fillLight);
 
     const floor = new THREE.Mesh(
       new THREE.CircleGeometry(3.8, 64),
@@ -659,30 +662,8 @@
     ringInner.position.y = 0.002;
     scene.add(ringInner);
 
-    const ringOuter = new THREE.Mesh(
-      new THREE.RingGeometry(1.15, 1.165, 64),
-      new THREE.MeshBasicMaterial({ color: 0x10b981, side: THREE.DoubleSide, transparent: true, opacity: 0.25 })
-    );
-    ringOuter.rotation.x = -Math.PI / 2;
-    ringOuter.position.y = 0.002;
-    scene.add(ringOuter);
-
-    const particleCount = 70;
-    const pPositions = new Float32Array(particleCount * 3);
-    for (let i = 0; i < particleCount; i++) {
-      pPositions[i * 3] = (Math.random() - 0.5) * 3.6;
-      pPositions[i * 3 + 1] = 0.2 + Math.random() * 2.4;
-      pPositions[i * 3 + 2] = (Math.random() - 0.5) * 3.2 - 0.4;
-    }
-    const pGeo = new THREE.BufferGeometry();
-    pGeo.setAttribute('position', new THREE.BufferAttribute(pPositions, 3));
-    const ambientParticles = new THREE.Points(pGeo, new THREE.PointsMaterial({
-      color: 0x7dd3fc, size: 0.016, transparent: true, opacity: 0.42
-    }));
-    scene.add(ambientParticles);
-
     const state = {
-      label: 'IDLE / LISTENING',
+      label: 'অপেক্ষমাণ / শুনছি',
       isSigning: false,
       leftWrist: [-0.46, 0.90],
       rightWrist: [0.46, 0.90],
@@ -690,136 +671,6 @@
       rightHand: new Array(63).fill(0),
     };
 
-    function createFallbackCharacter() {
-      const root = new THREE.Group();
-      const skinMat = new THREE.MeshPhysicalMaterial({ color: 0xe8b496, roughness: 0.52, clearcoat: 0.08 });
-      const palmBackMat = new THREE.MeshPhysicalMaterial({ color: 0xd49b7c, roughness: 0.58 });
-      const jacketMat = new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.55, metalness: 0.1 });
-      const shirtMat = new THREE.MeshStandardMaterial({ color: 0xf1f5f9, roughness: 0.5 });
-      const hairMat = new THREE.MeshStandardMaterial({ color: 0x181512, roughness: 0.7 });
-
-      const torso = new THREE.Group();
-      torso.position.set(0, 0.95, 0);
-      root.add(torso);
-
-      const chest = new THREE.Mesh(new THREE.CapsuleGeometry(0.18, 0.34, 12, 24), jacketMat);
-      chest.position.y = 0.24;
-      chest.scale.set(1.18, 1.0, 0.72);
-      chest.castShadow = true;
-      torso.add(chest);
-
-      const collar = new THREE.Mesh(new THREE.CylinderGeometry(0.085, 0.11, 0.14, 20), shirtMat);
-      collar.position.set(0, 0.43, 0.02);
-      torso.add(collar);
-
-      const headPivot = new THREE.Group();
-      headPivot.position.set(0, 0.48, 0);
-      torso.add(headPivot);
-
-      const neck = new THREE.Mesh(new THREE.CylinderGeometry(0.055, 0.065, 0.10, 16), skinMat);
-      neck.position.y = 0.04;
-      headPivot.add(neck);
-
-      const head = new THREE.Mesh(new THREE.SphereGeometry(0.125, 32, 32), skinMat);
-      head.position.y = 0.17;
-      head.scale.set(0.92, 1.08, 0.96);
-      head.castShadow = true;
-      headPivot.add(head);
-
-      const hair = new THREE.Mesh(new THREE.SphereGeometry(0.13, 32, 24, 0, Math.PI * 2, 0, Math.PI * 0.56), hairMat);
-      hair.position.set(0, 0.18, -0.01);
-      hair.scale.set(0.95, 1.06, 1.0);
-      headPivot.add(hair);
-
-      for (const side of [-1, 1]) {
-        const eye = new THREE.Mesh(new THREE.SphereGeometry(0.018, 16, 16), new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.2 }));
-        eye.position.set(side * 0.042, 0.18, 0.108);
-        headPivot.add(eye);
-        const pupil = new THREE.Mesh(new THREE.SphereGeometry(0.010, 12, 12), new THREE.MeshStandardMaterial({ color: 0x0284c7, roughness: 0.25 }));
-        pupil.position.set(side * 0.042, 0.18, 0.122);
-        headPivot.add(pupil);
-      }
-
-      function buildArm(sideSign) {
-        const shoulderPivot = new THREE.Group();
-        shoulderPivot.position.set(sideSign * 0.225, 0.40, 0);
-        torso.add(shoulderPivot);
-        shoulderPivot.add(new THREE.Mesh(new THREE.SphereGeometry(0.062, 16, 16), jacketMat));
-
-        const upperLen = 0.27;
-        const upperArm = new THREE.Mesh(new THREE.CapsuleGeometry(0.048, upperLen - 0.08, 10, 16), jacketMat);
-        upperArm.position.y = -upperLen * 0.5;
-        upperArm.castShadow = true;
-        shoulderPivot.add(upperArm);
-
-        const elbowPivot = new THREE.Group();
-        elbowPivot.position.set(0, -upperLen, 0);
-        shoulderPivot.add(elbowPivot);
-
-        const foreLen = 0.25;
-        const forearm = new THREE.Mesh(new THREE.CapsuleGeometry(0.038, foreLen - 0.07, 10, 16), skinMat);
-        forearm.position.y = -foreLen * 0.5;
-        forearm.castShadow = true;
-        elbowPivot.add(forearm);
-
-        const wristPivot = new THREE.Group();
-        wristPivot.position.set(0, -foreLen, 0);
-        elbowPivot.add(wristPivot);
-
-        const palm = new THREE.Mesh(new THREE.BoxGeometry(0.082, 0.092, 0.024), [
-          skinMat, skinMat, skinMat, skinMat, skinMat, palmBackMat
-        ]);
-        palm.position.y = -0.046;
-        palm.castShadow = true;
-        wristPivot.add(palm);
-
-        const fingerSpecs = [
-          { name: 'thumb', x: -sideSign * 0.044, y: -0.034, len: [0.030, 0.025, 0.021], r: 0.0115, isThumb: true },
-          { name: 'index', x: -sideSign * 0.029, y: -0.092, len: [0.034, 0.028, 0.022], r: 0.010, isThumb: false },
-          { name: 'middle', x: -sideSign * 0.010, y: -0.094, len: [0.037, 0.030, 0.023], r: 0.0105, isThumb: false },
-          { name: 'ring', x: sideSign * 0.010, y: -0.092, len: [0.034, 0.028, 0.022], r: 0.010, isThumb: false },
-          { name: 'pinky', x: sideSign * 0.029, y: -0.088, len: [0.028, 0.023, 0.019], r: 0.009, isThumb: false },
-        ];
-
-        const fingers = {};
-        for (const f of fingerSpecs) {
-          const j1 = new THREE.Group();
-          j1.position.set(f.x, f.y, 0);
-          if (f.isThumb) j1.rotation.z = -sideSign * 0.62;
-          wristPivot.add(j1);
-
-          const m1 = new THREE.Mesh(new THREE.CapsuleGeometry(f.r, f.len[0] * 0.65, 6, 10), skinMat);
-          m1.position.y = -f.len[0] * 0.5;
-          j1.add(m1);
-
-          const j2 = new THREE.Group();
-          j2.position.y = -f.len[0];
-          j1.add(j2);
-
-          const m2 = new THREE.Mesh(new THREE.CapsuleGeometry(f.r * 0.92, f.len[1] * 0.65, 6, 10), skinMat);
-          m2.position.y = -f.len[1] * 0.5;
-          j2.add(m2);
-
-          const j3 = new THREE.Group();
-          j3.position.y = -f.len[1];
-          j2.add(j3);
-
-          const m3 = new THREE.Mesh(new THREE.CapsuleGeometry(f.r * 0.85, f.len[2] * 0.65, 6, 10), skinMat);
-          m3.position.y = -f.len[2] * 0.5;
-          j3.add(m3);
-
-          fingers[f.name] = [j1, j2, j3];
-        }
-        return { shoulderPivot, elbowPivot, wristPivot, upperLen, foreLen, fingers };
-      }
-
-      return { root, torso, headPivot, leftArm: buildArm(-1), rightArm: buildArm(1) };
-    }
-
-    let proceduralRig = createFallbackCharacter();
-    scene.add(proceduralRig.root);
-
-    // REAL-HUMAN .GLB / .GLTF LOADER
     let gltfRig = null;
     const loader = new GLTFLoader();
 
@@ -840,8 +691,7 @@
     }
 
     function bindGLBModel(gltfScene, sourceLabel = 'character.gltf') {
-      if (proceduralRig) { scene.remove(proceduralRig.root); proceduralRig = null; }
-      if (gltfRig) { scene.remove(gltfRig.root); }
+      if (gltfRig) scene.remove(gltfRig.root);
 
       const box = new THREE.Box3().setFromObject(gltfScene);
       const size = new THREE.Vector3();
@@ -894,7 +744,6 @@
       }
 
       const rigMap = {
-        hips: findBoneByCandidates(boneList, ['hips', 'pelvis']),
         spine: findBoneByCandidates(boneList, ['spine2', 'spine1', 'spine', 'chest']),
         neck: findBoneByCandidates(boneList, ['neck', 'head']),
         right: mapSide('right', 'r'),
@@ -903,44 +752,19 @@
 
       scene.add(gltfScene);
       gltfRig = { root: gltfScene, rigMap, restQuats, restChildDirs };
-      const fingerCount = Object.values(rigMap.right.fingers).reduce((acc, arr) => acc + arr.length, 0) +
-                          Object.values(rigMap.left.fingers).reduce((acc, arr) => acc + arr.length, 0);
+      const fingerCount = Object.values(rigMap.right.fingers).reduce((a, b) => a + b.length, 0) +
+                          Object.values(rigMap.left.fingers).reduce((a, b) => a + b.length, 0);
       document.getElementById('model-info').innerHTML =
-        `Rig: <b>${sourceLabel}</b> (${boneList.length} bones, ${fingerCount} finger joints)`;
+        `Avatar Rig: <b>${sourceLabel}</b> (${boneList.length} bones, ${fingerCount} finger joints active)`;
     }
 
-    loader.load(
-      './character/character.gltf',
-      (gltf) => bindGLBModel(gltf.scene, 'Human 3D Avatar (character.gltf)'),
-      undefined,
-      () => {
-        loader.load(
-          './character.glb',
-          (gltf) => bindGLBModel(gltf.scene, 'Human 3D Avatar (character.glb)'),
-          undefined,
-          () => {}
-        );
-      }
-    );
+    loader.load('./character/character.gltf', (gltf) => bindGLBModel(gltf.scene, 'Human 3D Avatar (character.gltf)'));
 
-    function handleGLBFile(file) {
+    document.getElementById('glb-input').addEventListener('change', (e) => {
+      const file = e.target.files[0];
       if (!file) return;
       const url = URL.createObjectURL(file);
-      loader.load(url, (gltf) => {
-        bindGLBModel(gltf.scene, file.name);
-        URL.revokeObjectURL(url);
-      });
-    }
-
-    const dropCurtain = document.getElementById('drop-curtain');
-    let dragDepth = 0;
-    document.getElementById('glb-input').addEventListener('change', (e) => handleGLBFile(e.target.files[0]));
-    window.addEventListener('dragenter', (e) => { e.preventDefault(); dragDepth++; dropCurtain.classList.add('visible'); });
-    window.addEventListener('dragleave', (e) => { e.preventDefault(); dragDepth = Math.max(0, dragDepth - 1); if (dragDepth === 0) dropCurtain.classList.remove('visible'); });
-    window.addEventListener('dragover', (e) => e.preventDefault());
-    window.addEventListener('drop', (e) => {
-      e.preventDefault(); dragDepth = 0; dropCurtain.classList.remove('visible');
-      if (e.dataTransfer.files.length) handleGLBFile(e.dataTransfer.files[0]);
+      loader.load(url, (gltf) => { bindGLBModel(gltf.scene, file.name); URL.revokeObjectURL(url); });
     });
 
     function analyzeHandLandmarks(hand63, sideSign) {
@@ -948,21 +772,19 @@
       for (let i = 0; i < 21; i++) {
         pts.push(new THREE.Vector3(hand63[i * 3], -hand63[i * 3 + 1], -hand63[i * 3 + 2]));
       }
-
       const vIndex = new THREE.Vector3().subVectors(pts[5], pts[0]);
       const vPinky = new THREE.Vector3().subVectors(pts[17], pts[0]);
       const vUp = new THREE.Vector3().subVectors(pts[9], pts[0]).normalize();
       const palmNormal = new THREE.Vector3().crossVectors(vIndex, vPinky).normalize();
 
-      const pitch = THREE.MathUtils.clamp(-0.65 - vUp.y * 0.65, -1.35, 0.25);
-      const yaw = THREE.MathUtils.clamp(palmNormal.x * 1.1 - sideSign * 0.25, -1.4, 1.4);
-      const roll = THREE.MathUtils.clamp(-vUp.x * 0.85, -0.9, 0.9);
+      const pitch = THREE.MathUtils.clamp((1.0 - vUp.y) * 0.45 - 0.12, -0.45, 0.55);
+      const yaw = THREE.MathUtils.clamp(palmNormal.x * 0.85 - sideSign * 0.22, -1.1, 1.1);
+      const roll = THREE.MathUtils.clamp(-vUp.x * 0.65, -0.75, 0.75);
 
       function angleBetween(a, b, c) {
         const v1 = new THREE.Vector3().subVectors(a, b).normalize();
         const v2 = new THREE.Vector3().subVectors(c, b).normalize();
-        const dot = THREE.MathUtils.clamp(v1.dot(v2), -1, 1);
-        return Math.max(0, Math.PI - Math.acos(dot));
+        return Math.max(0, Math.PI - Math.acos(THREE.MathUtils.clamp(v1.dot(v2), -1, 1)));
       }
 
       const curls = {
@@ -972,7 +794,6 @@
         ring: [angleBetween(pts[0], pts[13], pts[14]) * 0.95, angleBetween(pts[13], pts[14], pts[15]) * 1.15, angleBetween(pts[14], pts[15], pts[16]) * 1.15],
         pinky: [angleBetween(pts[0], pts[17], pts[18]) * 0.95, angleBetween(pts[17], pts[18], pts[19]) * 1.15, angleBetween(pts[18], pts[19], pts[20]) * 1.15],
       };
-
       return { curls, wristRot: { x: pitch, y: yaw, z: roll } };
     }
 
@@ -1010,13 +831,10 @@
     function animate() {
       requestAnimationFrame(animate);
       const t = clock.getElapsedTime();
-
-      // Natural organic breathing and subtle posture sway waves
       const breathWave = Math.sin(t * 1.65);
       const swayWave = Math.sin(t * 0.72);
       const microHeadWave = Math.sin(t * 1.15);
 
-      ambientParticles.rotation.y = t * 0.035;
       ringInner.material.opacity = state.isSigning ? 0.65 + Math.sin(t * 3.2) * 0.15 : 0.35;
 
       if (camTween) {
@@ -1025,67 +843,13 @@
         if (camera.position.distanceTo(camTween.pos) < 0.005) camTween = null;
       }
 
-      const leftActive = state.leftWrist[1] < 0.78;
-      const rightActive = state.rightWrist[1] < 0.78;
-      const pullX = (leftActive ? state.leftWrist[0] : 0) + (rightActive ? state.rightWrist[0] : 0);
-      const activeHandY = rightActive ? state.rightWrist[1] : (leftActive ? state.leftWrist[1] : 0.3);
-
-      if (proceduralRig) {
-        const { torso, headPivot, leftArm, rightArm } = proceduralRig;
-        const downAxis = new THREE.Vector3(0, -1, 0);
-
-        torso.position.y = 0.95 + breathWave * 0.007;
-        torso.rotation.z = THREE.MathUtils.lerp(torso.rotation.z, -pullX * 0.12 + swayWave * 0.018, 0.09);
-        torso.rotation.y = THREE.MathUtils.lerp(torso.rotation.y, pullX * 0.16 + Math.cos(t * 0.6) * 0.02, 0.09);
-
-        headPivot.rotation.y = THREE.MathUtils.lerp(headPivot.rotation.y, pullX * 0.22 + microHeadWave * 0.035, 0.10);
-        headPivot.rotation.z = THREE.MathUtils.lerp(headPivot.rotation.z, -pullX * 0.08 + swayWave * 0.02, 0.10);
-        headPivot.rotation.x = THREE.MathUtils.lerp(
-          headPivot.rotation.x,
-          state.isSigning ? (activeHandY * 0.08 + Math.sin(t * 2.4) * 0.025) : (0.02 + breathWave * 0.015),
-          0.10
-        );
-
-        const arms = [
-          { rig: leftArm, wrist: state.leftWrist, hand: state.leftHand, side: -1 },
-          { rig: rightArm, wrist: state.rightWrist, hand: state.rightHand, side: 1 }
-        ];
-
-        for (const a of arms) {
-          const shWorld = new THREE.Vector3();
-          a.rig.shoulderPivot.getWorldPosition(shWorld);
-
-          const isDown = a.wrist[1] >= 0.78;
-          const idleFloatX = a.side * (0.27 + breathWave * 0.006);
-          const idleFloatY = 0.84 + breathWave * 0.010;
-          const targetWorld = isDown
-            ? new THREE.Vector3(idleFloatX, idleFloatY, 0.04 + swayWave * 0.01)
-            : new THREE.Vector3(a.wrist[0] * 0.56, 1.35 - a.wrist[1] * 0.48 + breathWave * 0.005, 0.32);
-
-          const poleWorld = new THREE.Vector3(a.side * 0.46, 0.90, -0.08);
-          const elbowWorld = solve2BoneIKWorld(shWorld, targetWorld, poleWorld, a.rig.upperLen, a.rig.foreLen);
-
-          aimBoneAtWorldPoint(a.rig.shoulderPivot, elbowWorld, downAxis, 0.24);
-          aimBoneAtWorldPoint(a.rig.elbowPivot, targetWorld, downAxis, 0.26);
-
-          const { curls, wristRot } = analyzeHandLandmarks(a.hand, a.side);
-          a.rig.wristPivot.rotation.x = THREE.MathUtils.lerp(a.rig.wristPivot.rotation.x, isDown ? 0.0 : wristRot.x, 0.22);
-          a.rig.wristPivot.rotation.y = THREE.MathUtils.lerp(a.rig.wristPivot.rotation.y, isDown ? 0.0 : wristRot.y, 0.22);
-          a.rig.wristPivot.rotation.z = THREE.MathUtils.lerp(a.rig.wristPivot.rotation.z, isDown ? 0.0 : wristRot.z, 0.22);
-
-          const idleCurl = 0.16 + breathWave * 0.03;
-          for (const [fname, joints] of Object.entries(a.rig.fingers)) {
-            const c = curls[fname];
-            for (let k = 0; k < 3; k++) {
-              const targetAngle = isDown ? -idleCurl : -c[k];
-              joints[k].rotation.x = THREE.MathUtils.lerp(joints[k].rotation.x, targetAngle, 0.30);
-            }
-          }
-        }
-      } else if (gltfRig) {
+      if (gltfRig) {
         const { rigMap, restQuats, restChildDirs } = gltfRig;
+        const leftActive = state.leftWrist[1] < 0.78;
+        const rightActive = state.rightWrist[1] < 0.78;
+        const pullX = (leftActive ? state.leftWrist[0] : 0) + (rightActive ? state.rightWrist[0] : 0);
+        const activeHandY = rightActive ? state.rightWrist[1] : (leftActive ? state.leftWrist[1] : 0.3);
 
-        // Subtle natural breathing in chest/spine and relaxed posture sway
         if (rigMap.spine && restQuats.has(rigMap.spine)) {
           const qBreath = new THREE.Quaternion().setFromEuler(
             new THREE.Euler(breathWave * 0.022, pullX * 0.14 + swayWave * 0.025, -pullX * 0.07 + swayWave * 0.015)
@@ -1093,7 +857,6 @@
           rigMap.spine.quaternion.slerp(restQuats.get(rigMap.spine).clone().multiply(qBreath), 0.10);
         }
 
-        // Natural head orientation: looks subtly toward active signing hand with micro-motion
         if (rigMap.neck && restQuats.has(rigMap.neck)) {
           const lookPitch = state.isSigning ? (activeHandY * 0.08 + Math.sin(t * 2.2) * 0.022) : (breathWave * 0.018);
           const lookYaw = pullX * 0.22 + microHeadWave * 0.04;
@@ -1112,8 +875,6 @@
           if (!arm || !fore || !hand) continue;
 
           const isDown = s.wrist[1] >= 0.78;
-
-          // Natural clavicle/shoulder lift when arm rises
           if (shoulder && restQuats.has(shoulder)) {
             const liftAmount = isDown ? (breathWave * 0.015) : THREE.MathUtils.clamp((0.4 - s.wrist[1]) * 0.14, -0.02, 0.12);
             const qClav = new THREE.Quaternion().setFromEuler(new THREE.Euler(0, 0, -s.side * liftAmount));
@@ -1126,19 +887,25 @@
           const L1 = Math.max(0.14, pSh.distanceTo(pEl));
           const L2 = Math.max(0.14, pEl.distanceTo(pWr));
 
+          // Always keep active gestures at or above mid-chest (pSh.y - 0.10) up to forehead height (pSh.y + 0.16)
+          const isHighHeadSign = s.wrist[1] < -0.18;
+          const headPullZ = isHighHeadSign ? 0.22 : 0.31;
+          const headPullX = isHighHeadSign ? s.wrist[0] * 0.38 : s.wrist[0] * 0.48;
+          const targetY = Math.max(pSh.y - 0.10, pSh.y - s.wrist[1] * 0.46) + breathWave * 0.004;
+
           const targetWorld = isDown
             ? new THREE.Vector3(
                 pSh.x + s.side * (0.05 + breathWave * 0.008),
                 pSh.y - (L1 + L2) * 0.94 + breathWave * 0.008,
                 pSh.z + 0.04 + swayWave * 0.01
               )
-            : new THREE.Vector3(s.wrist[0] * 0.54, pSh.y - s.wrist[1] * 0.46 + breathWave * 0.005, pSh.z + 0.32);
+            : new THREE.Vector3(headPullX, targetY, pSh.z + headPullZ);
 
           const poleWorld = new THREE.Vector3(pSh.x + s.side * 0.35, pSh.y - 0.36, pSh.z - 0.12);
           const elbowWorld = solve2BoneIKWorld(pSh, targetWorld, poleWorld, L1, L2);
 
-          aimBoneAtWorldPoint(arm, elbowWorld, restChildDirs.get(arm), 0.22);
-          aimBoneAtWorldPoint(fore, targetWorld, restChildDirs.get(fore), 0.25);
+          aimBoneAtWorldPoint(arm, elbowWorld, restChildDirs.get(arm), 0.25);
+          aimBoneAtWorldPoint(fore, targetWorld, restChildDirs.get(fore), 0.28);
 
           const { curls, wristRot } = analyzeHandLandmarks(s.hand63, s.side);
           if (restQuats.has(hand)) {
@@ -1146,10 +913,9 @@
               ? new THREE.Euler(0.04 + breathWave * 0.02, 0, 0)
               : new THREE.Euler(wristRot.x * 0.45, wristRot.y * 0.5, wristRot.z * 0.4);
             const targetHandQ = restQuats.get(hand).clone().multiply(new THREE.Quaternion().setFromEuler(wristEuler));
-            hand.quaternion.slerp(targetHandQ, 0.22);
+            hand.quaternion.slerp(targetHandQ, 0.24);
           }
 
-          // Relaxed natural finger curl when hand is resting by his side
           const idleCurl = 0.18 + breathWave * 0.03;
           for (const [fName, joints] of Object.entries(fingers)) {
             for (let j = 0; j < joints.length; j++) {
@@ -1157,7 +923,7 @@
               if (bone && restQuats.has(bone)) {
                 const curlVal = isDown ? idleCurl : curls[fName][j];
                 const qCurl = new THREE.Quaternion().setFromEuler(new THREE.Euler(curlVal, 0, 0));
-                bone.quaternion.slerp(restQuats.get(bone).clone().multiply(qCurl), 0.30);
+                bone.quaternion.slerp(restQuats.get(bone).clone().multiply(qCurl), 0.32);
               }
             }
           }
@@ -1173,6 +939,7 @@
     let socket = null;
     let renderedVocabKey = '';
     let renderedGlossKey = '';
+    let renderedCustomKey = '';
     const wsBadge = document.getElementById('ws-badge');
     const wsText = document.getElementById('ws-text');
     const statusText = document.getElementById('status-text');
@@ -1185,6 +952,9 @@
     const btnDots = document.getElementById('btn-dots');
     const btnVoice = document.getElementById('btn-voice');
     const vocabStrip = document.getElementById('vocab-strip');
+    const customChipList = document.getElementById('custom-chip-list');
+    const captureStatusBadge = document.getElementById('capture-status-badge');
+    const btnRecordLive = document.getElementById('btn-record-live');
 
     function sendAction(payload) {
       if (socket && socket.readyState === WebSocket.OPEN) {
@@ -1196,7 +966,7 @@
       socket = new WebSocket('ws://127.0.0.1:8765');
       socket.onopen = () => {
         wsBadge.classList.add('connected');
-        wsText.textContent = 'LIVE STUDIO SYNC';
+        wsText.textContent = 'Live Studio Connected';
       };
       socket.onmessage = (event) => {
         const data = JSON.parse(event.data);
@@ -1210,15 +980,49 @@
         performingWord.textContent = data.label;
         statusText.textContent = data.status;
 
+        if (data.capture_active) {
+          if (data.capture_phase === 'countdown') {
+            captureStatusBadge.textContent = `Get ready (${data.capture_label}): ${data.capture_remaining}s...`;
+            captureStatusBadge.style.color = '#facc15';
+          } else {
+            captureStatusBadge.textContent = `Recording '${data.capture_label}': ${data.capture_remaining}s left (${data.capture_frames} frames)`;
+            captureStatusBadge.style.color = '#34d399';
+          }
+          btnRecordLive.disabled = true;
+          btnRecordLive.textContent = `Recording (${data.capture_remaining}s)...`;
+        } else {
+          captureStatusBadge.textContent = '5.0s live capture';
+          captureStatusBadge.style.color = '#94a3b8';
+          btnRecordLive.disabled = false;
+          btnRecordLive.textContent = 'Record Live (5s)';
+        }
+
+        if (Array.isArray(data.custom_signs)) {
+          const cKey = JSON.stringify(data.custom_signs);
+          if (cKey !== renderedCustomKey) {
+            renderedCustomKey = cKey;
+            if (data.custom_signs.length === 0) {
+              customChipList.innerHTML = '<span style="font-size:0.76rem; color:var(--text-muted);">Enrolled Zero-Retrain Signs: None yet</span>';
+            } else {
+              customChipList.innerHTML = '<span style="font-size:0.76rem; color:#94a3b8;">Enrolled:</span>' +
+                data.custom_signs.map((item) =>
+                  `<span class="custom-chip">${item.label} <small style="opacity:0.7;">(${item.category})</small><button data-del="${item.label}" title="Remove">&times;</button></span>`
+                ).join('');
+              customChipList.querySelectorAll('button[data-del]').forEach((btn) => {
+                btn.addEventListener('click', () => {
+                  sendAction({ action: 'delete_custom_sign', label: btn.dataset.del });
+                });
+              });
+            }
+          }
+        }
+
         if (Array.isArray(data.available_signs)) {
           const key = data.available_signs.join(',');
           if (key !== renderedVocabKey) {
             renderedVocabKey = key;
-            vocabStrip.innerHTML = '<span class="gloss-label">Quick Sign:</span>' +
-              data.available_signs.map((s) => {
-                const clean = s.replace(/_/g, ' ');
-                return `<span class="vocab-tag" data-sign="${clean}">${clean.toUpperCase()}</span>`;
-              }).join('');
+            vocabStrip.innerHTML = '<span class="gloss-label">দ্রুত ইশারা:</span>' +
+              data.available_signs.map((s) => `<span class="vocab-tag" data-sign="${s}">${s}</span>`).join('');
             vocabStrip.querySelectorAll('.vocab-tag').forEach((el) => {
               el.addEventListener('click', () => {
                 sendAction({ action: 'enqueue', text: el.dataset.sign });
@@ -1228,26 +1032,26 @@
         }
 
         if (data.cam_frame) camFeed.src = 'data:image/jpeg;base64,' + data.cam_frame;
-        const isDetected = data.live_label && !['No Hand', 'Neutral / Resting', 'Starting Camera...'].includes(data.live_label);
+        const isDetected = data.live_label && !['হাত দেখা যাচ্ছে না', 'স্বাভাবিক অবস্থা', 'ক্যামেরা চালু হচ্ছে...'].includes(data.live_label);
         camStatusPill.textContent = `Detected: ${data.live_label} (${data.confidence}%)`;
         camStatusPill.classList.toggle('active', isDetected);
         camWrapper.classList.toggle('active-sign', isDetected);
 
         btnDots.textContent = `Skeleton: ${data.show_dots ? 'ON' : 'OFF'}`;
-        btnVoice.textContent = data.is_listening ? 'Listening (4s)...' : 'Voice Mic [V]';
+        btnVoice.textContent = data.is_listening ? 'শুনছি (৪ সেকেন্ড)...' : 'বাংলা ভয়েস [V]';
         btnVoice.classList.toggle('listening', Boolean(data.is_listening));
 
         const glossKey = Array.isArray(data.glosses) ? data.glosses.join('|') : '';
         if (glossKey !== renderedGlossKey) {
           renderedGlossKey = glossKey;
           if (data.glosses && data.glosses.length > 0) {
-            glossContainer.innerHTML = '<span class="gloss-label">Gloss Stream</span>' +
+            glossContainer.innerHTML = '<span class="gloss-label">শনাক্তকৃত শব্দসমূহ:</span>' +
               data.glosses.map((g, idx) =>
-                `<span class="gloss-chip">${g.toUpperCase()}</span>${idx < data.glosses.length - 1 ? '<span class="gloss-arrow">&rarr;</span>' : ''}`
+                `<span class="gloss-chip">${g}</span>${idx < data.glosses.length - 1 ? '<span class="gloss-arrow">&rarr;</span>' : ''}`
               ).join('');
           } else {
-            glossContainer.innerHTML = '<span class="gloss-label">Gloss Stream</span>' +
-              '<span style="color:var(--text-muted); font-size:0.80rem;">(Hold a sign clearly to add...)</span>';
+            glossContainer.innerHTML = '<span class="gloss-label">শনাক্তকৃত শব্দসমূহ:</span>' +
+              '<span style="color:var(--text-muted); font-size:0.86rem;">(স্পষ্টভাবে হাতের ইশারা দেখান...)</span>';
           }
         }
 
@@ -1255,17 +1059,36 @@
           sentenceBox.textContent = data.sentence;
           sentenceBox.classList.remove('empty');
         } else {
-          sentenceBox.textContent = 'Your constructed sentence will appear here...';
+          sentenceBox.textContent = 'আপনার তৈরি করা বাংলা বাক্য এখানে দেখা যাবে...';
           sentenceBox.classList.add('empty');
         }
       };
       socket.onclose = () => {
         wsBadge.classList.remove('connected');
-        wsText.textContent = 'RECONNECTING...';
+        wsText.textContent = 'Reconnecting...';
         setTimeout(connectWS, 1500);
       };
     }
     connectWS();
+
+    // Zero-Retrain Drawer Controls
+    const customDrawer = document.getElementById('custom-drawer');
+    document.getElementById('btn-toggle-custom').addEventListener('click', () => {
+      customDrawer.classList.toggle('open');
+    });
+
+    const customLabelInput = document.getElementById('custom-sign-label');
+    const customCatSelect = document.getElementById('custom-category');
+    btnRecordLive.addEventListener('click', () => {
+      const lbl = customLabelInput.value.trim();
+      if (!lbl) return;
+      sendAction({
+        action: 'add_custom_sign',
+        label: lbl,
+        category: customCatSelect.value
+      });
+      customLabelInput.value = '';
+    });
 
     const phraseInput = document.getElementById('phrase-input');
     function sendPhrase() {
@@ -1286,7 +1109,7 @@
     document.getElementById('cam-reset').addEventListener('click', () => flyCameraTo([0, 1.44, 2.22], [0, 1.35, 0]));
 
     window.addEventListener('keydown', (e) => {
-      if (document.activeElement && document.activeElement.tagName === 'INPUT') return;
+      if (document.activeElement && (document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'SELECT')) return;
       if (e.code === 'Space') { e.preventDefault(); sendAction({ action: 'speak' }); }
       else if (e.key === 'v' || e.key === 'V') { sendAction({ action: 'voice' }); }
       else if (e.key === 'Backspace') { sendAction({ action: 'undo' }); }

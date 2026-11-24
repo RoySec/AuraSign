@@ -1,34 +1,17 @@
-import csv
 import json
 import os
 import time
-
-os.environ['GLOG_minloglevel'] = '2'
-
 import cv2
 import mediapipe as mp
+import numpy as np
+from PIL import Image, ImageDraw, ImageFont
 from mediapipe.tasks import python
 from mediapipe.tasks.python import vision
 
 from features import extract_holistic_features
 
-CSV_FILE = 'data.csv'
-AVATAR_FILE = 'avatar_poses.json'
-SAMPLES_PER_SIGN = 100
-
-DEFAULT_SIGNS = [
-    '_neutral_',
-    'hello',
-    'yes',
-    'no',
-    'thank_you',
-    'i_love_you',
-    'help',
-    'pain',
-    'doctor',
-    'water',
-    'please'
-]
+DATASET_FILE = 'bangla_dataset.json'
+RECORD_SECONDS = 5.0
 
 HAND_CONNECTIONS = [
     (0, 1), (1, 2), (2, 3), (3, 4),
@@ -39,183 +22,165 @@ HAND_CONNECTIONS = [
 ]
 
 
-def draw_skeleton(frame, hand_res):
+def load_bangla_font(size=24):
+    candidates = [
+        r"C:\Windows\Fonts\Nirmala.ttf",
+        r"C:\Windows\Fonts\NirmalaB.ttf",
+        r"C:\Windows\Fonts\vrinda.ttf",
+        r"C:\Windows\Fonts\kalpurush.ttf",
+    ]
+    for path in candidates:
+        if os.path.isfile(path):
+            return ImageFont.truetype(path, size)
+    return ImageFont.load_default()
+
+
+FONT_BANGLA = load_bangla_font(24)
+
+
+def draw_banner(frame, text_lines, bg_color=(15, 23, 42)):
     h, w, _ = frame.shape
-    if hand_res and hand_res.hand_landmarks:
-        for hand in hand_res.hand_landmarks:
-            pts = [(int(lm.x * w), int(lm.y * h)) for lm in hand]
-            for a, b in HAND_CONNECTIONS:
-                cv2.line(frame, pts[a], pts[b], (0, 235, 130), 2, cv2.LINE_AA)
-            for cx, cy in pts:
-                cv2.circle(frame, (cx, cy), 3, (255, 255, 255), -1)
+    banner_h = 34 * len(text_lines) + 18
+    overlay = frame.copy()
+    cv2.rectangle(overlay, (0, 0), (w, banner_h), bg_color, -1)
+    cv2.addWeighted(overlay, 0.82, frame, 0.18, 0, frame)
+
+    pil_img = Image.fromarray(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB))
+    draw = ImageDraw.Draw(pil_img)
+    for idx, (line, color) in enumerate(text_lines):
+        draw.text((16, 10 + idx * 34), line, font=FONT_BANGLA, fill=color)
+    return cv2.cvtColor(np.array(pil_img), cv2.COLOR_RGB2BGR)
 
 
-def load_existing_dataset():
-    existing_rows = []
-    existing_labels = set()
-    if os.path.isfile(CSV_FILE):
-        with open(CSV_FILE, mode='r', encoding='utf-8') as f:
-            reader = csv.reader(f)
-            next(reader, None)
-            for row in reader:
-                if len(row) == 208:
-                    existing_rows.append(row)
-                    existing_labels.add(row[0])
+def draw_skeleton(frame, hand_res):
+    if not hand_res or not hand_res.hand_landmarks:
+        return
+    h, w, _ = frame.shape
+    for hand in hand_res.hand_landmarks:
+        pts = [(int(lm.x * w), int(lm.y * h)) for lm in hand]
+        for a, b in HAND_CONNECTIONS:
+            cv2.line(frame, pts[a], pts[b], (0, 230, 130), 2, cv2.LINE_AA)
+        for cx, cy in pts:
+            cv2.circle(frame, (cx, cy), 4, (56, 189, 248), -1)
 
-    avatar_poses = {}
-    if os.path.isfile(AVATAR_FILE):
-        with open(AVATAR_FILE, mode='r', encoding='utf-8') as f:
-            avatar_poses = json.load(f)
 
-    return existing_rows, existing_labels, avatar_poses
+def load_dataset():
+    if os.path.isfile(DATASET_FILE):
+        with open(DATASET_FILE, 'r', encoding='utf-8') as f:
+            return json.load(f)
+    return {"signs": {}}
+
+
+def save_dataset(data):
+    with open(DATASET_FILE, 'w', encoding='utf-8') as f:
+        json.dump(data, f, ensure_ascii=False, indent=2)
 
 
 def main():
-    print("=== AuraSign Multi-Language Dataset Collector ===")
-    existing_rows, existing_labels, avatar_poses = load_existing_dataset()
+    dataset = load_dataset()
+    saved_keys = list(dataset["signs"].keys())
+    print("\n========================================================")
+    print("  AuraSign Bangla — 5-Second Gesture Motion Recorder")
+    print("========================================================")
+    print(f"Saved signs ({len(saved_keys)}): {saved_keys if saved_keys else 'None yet'}")
+    print("Tip: Type '_neutral_' once to record resting/idle hands.\n")
 
-    append_mode = False
-    if existing_labels:
-        saved_words = sorted(w for w in existing_labels if w != '_neutral_')
-        print(f"Existing trained signs ({len(saved_words)}): {', '.join(saved_words)}")
-        choice = input("Add/update signs into existing dataset [A] or Wipe & start fresh [W]? (A/W): ").strip().lower()
-        append_mode = (choice != 'w')
+    sign_label = input("Enter Bangla gesture name (e.g. হ্যালো / সাহায্য / ধন্যবাদ): ").strip()
+    if not sign_label:
+        print("No label entered. Cancelled.")
+        return
 
-    if not append_mode:
-        existing_rows = []
-        existing_labels = set()
-        avatar_poses = {}
-
-    custom = input(
-        "Type new comma-separated words/phrases (any language, e.g. kemon_acho, bhalo, sorry) or press ENTER for defaults: "
-    ).strip()
-
-    if custom:
-        words = [w.strip().lower().replace(' ', '_') for w in custom.split(',') if w.strip()]
-        # Only prompt for _neutral_ if it is not already in the dataset
-        if '_neutral_' not in existing_labels and '_neutral_' not in words:
-            signs = ['_neutral_'] + words
-        else:
-            signs = words
-    else:
-        signs = [s for s in DEFAULT_SIGNS if not append_mode or s not in existing_labels]
-        if not signs:
-            print("All default signs are already recorded! Run again and type new custom words.")
-            return
+    cap = cv2.VideoCapture(0, cv2.CAP_DSHOW) if os.name == 'nt' else cv2.VideoCapture(0)
+    cap.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
+    cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
 
     hand_detector = vision.HandLandmarker.create_from_options(
         vision.HandLandmarkerOptions(
             base_options=python.BaseOptions(model_asset_path='hand_landmarker.task'),
             num_hands=2,
-            min_hand_detection_confidence=0.6
+            min_hand_detection_confidence=0.60,
+            min_tracking_confidence=0.60
         )
     )
     pose_detector = vision.PoseLandmarker.create_from_options(
         vision.PoseLandmarkerOptions(
             base_options=python.BaseOptions(model_asset_path='pose_landmarker_lite.task'),
             num_poses=1,
-            min_pose_detection_confidence=0.6
+            min_pose_detection_confidence=0.60
         )
     )
 
-    cap = cv2.VideoCapture(0)
+    recording = False
+    record_start_time = 0.0
+    countdown_start = None
+    captured_frames = []
 
-    for sign in signs:
-        is_neutral = (sign == '_neutral_')
-        title = "NEUTRAL / RESTING HANDS (DO NOT SIGN)" if is_neutral else f"SIGN: {sign.replace('_', ' ').upper()}"
-        tip = (
-            "Keep hands visible near chest/lap & move naturally without signing"
-            if is_neutral else
-            "Hold your sign clearly; tilt/shift angle slightly during capture"
-        )
+    print(f"\nCamera ready! Press [SPACE] in the camera window to record '{sign_label}' for {RECORD_SECONDS:.0f}s, or [Q] to quit.")
 
+    try:
         while True:
             ret, frame = cap.read()
             if not ret:
-                break
+                continue
+
             frame = cv2.flip(frame, 1)
             rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
             mp_img = mp.Image(image_format=mp.ImageFormat.SRGB, data=rgb)
-            hand_res = hand_detector.detect(mp_img)
-            draw_skeleton(frame, hand_res)
-
-            cv2.rectangle(frame, (0, 0), (frame.shape[1], 115), (18, 20, 26), -1)
-            cv2.putText(frame, title, (18, 36), cv2.FONT_HERSHEY_SIMPLEX, 0.78, (0, 230, 255), 2)
-            cv2.putText(frame, tip, (18, 68), cv2.FONT_HERSHEY_SIMPLEX, 0.52, (200, 220, 255), 1)
-            cv2.putText(frame, "Press [SPACE] to record | [S] Skip | [Q] Save & Quit", (18, 98),
-                        cv2.FONT_HERSHEY_SIMPLEX, 0.55, (120, 255, 160), 1)
-            cv2.imshow("AuraSign Collector", frame)
-
-            key = cv2.waitKey(1) & 0xFF
-            if key == ord(' '):
-                action = 'record'
-                break
-            elif key == ord('s'):
-                action = 'skip'
-                break
-            elif key == ord('q'):
-                action = 'quit'
-                break
-
-        if action == 'quit':
-            break
-        if action == 'skip':
-            continue
-
-        captured = []
-        while len(captured) < SAMPLES_PER_SIGN:
-            ret, frame = cap.read()
-            if not ret:
-                break
-            frame = cv2.flip(frame, 1)
-            rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-            mp_img = mp.Image(image_format=mp.ImageFormat.SRGB, data=rgb)
-
             hand_res = hand_detector.detect(mp_img)
             pose_res = pose_detector.detect(mp_img)
+
             draw_skeleton(frame, hand_res)
 
-            if hand_res.hand_landmarks:
-                feats = [round(v, 5) for v in extract_holistic_features(hand_res, pose_res)]
-                captured.append(feats)
+            if countdown_start is not None:
+                rem = 2.0 - (time.time() - countdown_start)
+                if rem > 0:
+                    frame = draw_banner(frame, [
+                        (f"Target Sign: {sign_label}", (56, 189, 248)),
+                        (f"Get ready... 5s recording starts in {rem:.1f}s", (250, 204, 21))
+                    ])
+                else:
+                    countdown_start = None
+                    recording = True
+                    record_start_time = time.time()
+                    captured_frames = []
 
-            cv2.rectangle(frame, (0, 0), (frame.shape[1], 80), (18, 20, 26), -1)
-            cv2.putText(frame, f"Recording {sign.upper()}: {len(captured)}/{SAMPLES_PER_SIGN}",
-                        (20, 48), cv2.FONT_HERSHEY_SIMPLEX, 0.85, (0, 255, 140), 2)
-            cv2.imshow("AuraSign Collector", frame)
-            cv2.waitKey(1)
+            elif recording:
+                elapsed = time.time() - record_start_time
+                remaining = max(0.0, RECORD_SECONDS - elapsed)
 
-        if captured:
-            # Replace older samples if re-recording an existing sign so the dataset stays balanced
-            existing_rows = [r for r in existing_rows if r[0] != sign]
-            for feats in captured:
-                existing_rows.append([sign] + feats)
+                if sign_label == '_neutral_' or hand_res.hand_landmarks:
+                    feat = extract_holistic_features(hand_res, pose_res)
+                    captured_frames.append([round(float(x), 5) for x in feat])
 
-            if not is_neutral and len(captured) >= 4:
-                n = len(captured)
-                avatar_poses[sign] = [
-                    captured[0],
-                    captured[n // 3],
-                    captured[(2 * n) // 3],
-                    captured[-1]
-                ]
-            print(f"Saved {len(captured)} frames for '{sign}'.")
-            time.sleep(0.3)
+                frame = draw_banner(frame, [
+                    (f"Recording '{sign_label}': {remaining:.1f}s left ({len(captured_frames)} frames)", (52, 211, 153)),
+                    ("Perform the gesture clearly for 5 seconds...", (248, 250, 252))
+                ], bg_color=(6, 45, 32))
 
-    cap.release()
-    cv2.destroyAllWindows()
+                if elapsed >= RECORD_SECONDS:
+                    if len(captured_frames) >= 5:
+                        dataset["signs"][sign_label] = captured_frames
+                        save_dataset(dataset)
+                        print(f"[Saved] Recorded {len(captured_frames)} frames over 5.0s for '{sign_label}'.")
+                    else:
+                        print("[Warning] Too few hand frames detected during 5.0s. Try again with hands visible.")
+                    recording = False
+                    break
+            else:
+                frame = draw_banner(frame, [
+                    (f"Ready to record (5s): {sign_label}", (56, 189, 248)),
+                    ("Press [SPACE] to start 5s recording | [Q] to cancel", (226, 232, 240))
+                ])
 
-    with open(CSV_FILE, mode='w', newline='', encoding='utf-8') as f:
-        writer = csv.writer(f)
-        writer.writerow(['label'] + [f'f{i}' for i in range(207)])
-        writer.writerows(existing_rows)
-
-    with open(AVATAR_FILE, 'w', encoding='utf-8') as f:
-        json.dump(avatar_poses, f, indent=2, ensure_ascii=False)
-
-    total_classes = len({r[0] for r in existing_rows})
-    print(f"\nDone! '{CSV_FILE}' now holds {len(existing_rows)} samples across {total_classes} classes.")
-    print("Run 'python train.py' to update your model!")
+            cv2.imshow("AuraSign Bangla Collector", frame)
+            key = cv2.waitKey(1) & 0xFF
+            if key == ord(' ') and not recording and countdown_start is None:
+                countdown_start = time.time()
+            elif key in (ord('q'), ord('Q'), 27):
+                break
+    finally:
+        cap.release()
+        cv2.destroyAllWindows()
 
 
 if __name__ == '__main__':
